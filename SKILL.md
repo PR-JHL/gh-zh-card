@@ -63,6 +63,8 @@ python gh_card.py --payload p.json --offline --out out/ --name 01-slug --md --ca
 | 硬核/科幻/机器人/航天，或重大发布 | `wandering-earth`（冰蓝 HUD、警示红条） |
 | 需要更多风格 | `--style-dir /path/to/design-cards/styles` 后用 `--style <id>` |
 
+**署名**：卡片底部默认有一行很淡的 `gh-zh-card · github.com/…`。**别关它**（`--no-credit`）——那和"把项目链接从卡片上撕掉"是一回事，是这个工具唯一的传播入口。
+
 **风格不能乱配。** 一个桌面宠物项目套「流浪地球」会显得可笑；一个工业软件套柔光紫也不对。拿不准就用 `obsidian`。
 
 产出：

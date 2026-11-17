@@ -106,6 +106,16 @@ python gh_card.py --payload payloads/pinky.json --offline --out examples/ --styl
 | `stars` / `language` / `license` / `updated` | | `--fetch` 自动填；`--offline` 时须已核实 |
 | `topics` | | 最多 3 个，用仓库真实 topics |
 
+## 署名
+
+生成的卡片底部有一行很淡的
+
+```
+gh-zh-card · github.com/PR-JHL/gh-zh-card
+```
+
+这是这个工具唯一的传播方式——**卡片被转发时，链接跟着走**。不想要就加 `--no-credit`。
+
 ## 设计原则
 
 1. **数字必须真。** 卡片上唯一能被一眼验证的就是 stars 和 license，编一次就没人信了。

@@ -579,6 +579,15 @@ def render(payload: dict, out_path: Path, style: dict | None = None) -> Path:
         for t in topics:
             tx = pill(d, tx, 66, "#" + t, f_t, ACCENT2_TEXT, CARD_HI, padx=8, pady=6) + 16
 
+    # 署名：卡片被转发时链接跟着走 —— 这是这个工具唯一的自然传播入口
+    if (style.get("decor") or {}).get("credit", True):
+        f_cr = load_font("cn", 15)
+        credit = "gh-zh-card · github.com/PR-JHL/gh-zh-card"
+        cw = text_w(d, credit, f_cr)
+        # 把弱化色再往背景压 45%，保证不抢内容
+        credit_col = tuple(int(c + (BG_BOT[i] - c) * 0.45) for i, c in enumerate(FAINT))
+        d.text(((W - cw) // 2, H - 32), credit, font=f_cr, fill=credit_col)
+
     draw_decor_over(d, style)
     img.save(out_path, "PNG", optimize=True)
     return out_path
@@ -651,6 +660,8 @@ def main() -> None:
                     help="风格 id（styles/<id>.json）或风格 JSON 的路径，默认 obsidian")
     ap.add_argument("--style-dir", action="append", default=[],
                     help="额外风格目录，可重复；用来加载 design-cards 里的风格库")
+    ap.add_argument("--no-credit", action="store_true",
+                    help="不画底部署名（默认画：卡片被转发时带上项目链接）")
     args = ap.parse_args()
 
     payload: dict = {}
@@ -670,6 +681,8 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     stem = args.name or f"{payload['owner']}__{payload['repo']}".replace("/", "__")
     style = load_style(args.style, [Path(p) for p in args.style_dir])
+    if args.no_credit:
+        style.setdefault("decor", {})["credit"] = False
     png = render(payload, out_dir / f"{stem}.png", style)
     print(f"风格: {style.get('name_zh') or style.get('id')}")
 
