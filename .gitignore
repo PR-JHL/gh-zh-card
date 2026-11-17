@@ -1,0 +1,13 @@
+# 产物
+out/
+__pycache__/
+*.pyc
+
+# 本地环境
+.venv/
+venv/
+
+# 编辑器
+.vscode/
+.idea/
+.DS_Store

@@ -1,0 +1,38 @@
+{
+  "id": "obsidian",
+  "name": "Obsidian",
+  "name_zh": "曜石",
+  "mood": ["专注", "低光", "紫色高级感", "编辑器感"],
+  "palette": {
+    "bg_top": "#1B1926",
+    "bg_bottom": "#272338",
+    "surface": "#312C42",
+    "surface_alt": "#3B3550",
+    "text": "#EDE9F5",
+    "text_dim": "#ABA3BC",
+    "text_faint": "#8F879E",
+    "accent": "#A888FF",
+    "accent_2": "#7FD6F0",
+    "accent_3": "#C7A6FF",
+    "good": "#B3F0B4",
+    "line": "#453D5C"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "accent",
+    "glow": 0.30,
+    "vignette": 0.10
+  },
+  "type": {
+    "title_scale": 1.0,
+    "lead": 1.34,
+    "mono_install": true
+  },
+  "motifs": ["左侧长强调条", "紫色柔光", "低对比分割线", "等宽命令块"],
+  "avoid": ["纯黑 #000", "高饱和撞色", "荧光绿"],
+  "use_for": ["技术文章封面", "开源项目卡片", "代码类内容", "开发者工具介绍"],
+  "refs": ["VS Code 主题 Obsidian", "深夜编辑器"]
+}

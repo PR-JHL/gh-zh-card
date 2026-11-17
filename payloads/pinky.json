@@ -1,0 +1,20 @@
+{
+  "owner": "DIYgod",
+  "repo": "pinky",
+  "url": "https://github.com/DIYgod/pinky",
+  "name_zh": "Pinky",
+  "tagline": "让任何 AI agent 隔着电脑操作你的 iPhone / Android，而且每一步你都能插手",
+  "pain": [
+    "手机上最烦的是重复动作：点确认、翻列表、回消息。脚本能跑，但出事没人兜底",
+    "它把「agent 操作手机」和「人随时接管」缝在一起：支付、发消息这类动作默认要你批准",
+    "批准逻辑放在网关里强制执行，不是写在提示词里求 agent 自觉"
+  ],
+  "for_who": "想让 AI 接管手机上的重复劳动，但不敢把手机完全交出去的人",
+  "start": "去 Releases 下载安装 → 设置 › Agents 一键接上 Claude Code / Codex / Cursor",
+  "verdict": "手机自动化方案里，把「人随时能接管」做得最认真的一个。想省手机上的重复劳动，先看它。",
+  "stars": 2059,
+  "language": "Go",
+  "license": "Apache-2.0",
+  "updated": "2026-11-13T09:00:00Z",
+  "topics": []
+}
