@@ -546,7 +546,10 @@ def render(payload: dict, out_path: Path, style: dict | None = None) -> Path:
                 break
         lines_v = lines_v[:5]
         block_h = len(lines_v) * int(f_v.size * 1.45) + 34
-        by = foot_line - 24 - block_h
+        # 在「内容末尾」和「页脚分割线」之间居中，避免短内容时出现一大块空洞
+        top_limit = y + 24
+        bottom_limit = foot_line - 24 - block_h
+        by = min(bottom_limit, max(top_limit, y + max(0, (bottom_limit - y) // 2)))
         by = max(by, y)
         d.rounded_rectangle([x, by, W - PAD, by + block_h], radius=18, fill=CARD)
         d.rounded_rectangle([x, by + 10, x + 5, by + block_h - 10], radius=3, fill=ACCENT2)

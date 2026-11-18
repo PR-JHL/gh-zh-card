@@ -1,0 +1,48 @@
+name: 想被做成中文速览卡
+description: 提一个你希望被做成中文卡片的 GitHub 项目（可以是自己的，也可以是你在用的）
+title: "[卡片请求] owner/repo"
+labels: ["card-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        这个模板用来收「希望被做成中文速览卡」的项目。
+
+        卡片长这样：一句话定位 + 三条具体痛点 + 适合谁 + 怎么开始 + 真实 star 数。
+        下面的信息填得越具体，出来的卡片越有用——因为卡片上的每一个数字和功能都会被核实。
+
+  - type: input
+    id: repo
+    attributes:
+      label: 仓库地址
+      description: 形如 owner/repo，或完整的 GitHub 链接
+      placeholder: e.g. Noniv/abyssal-garden
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: 为什么值得被更多人看到
+      description: 一句到三句。写「它解决了什么真问题」，不要写「它很厉害」
+      placeholder: 例：它让不装任何厂商驱动就能在任务栏看外设电量，省掉了四套全家桶。
+    validations:
+      required: true
+
+  - type: textarea
+    id: highlight
+    attributes:
+      label: 希望卡片突出的点（可选）
+      description: 比如某个数字、某个反常识的做法、某个容易误解的地方
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 确认
+      options:
+        - label: 这个项目是公开的，且仓库作者没有禁止此类引用
+          required: true
+        - label: 我理解卡片只引用 README 里的公开信息，数字来自 GitHub API
+          required: true

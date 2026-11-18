@@ -129,6 +129,12 @@ gh-zh-card · github.com/PR-JHL/gh-zh-card
 
 这是这个工具唯一的传播方式——**卡片被转发时，链接跟着走**。不想要就加 `--no-credit`。
 
+## 想让自己的项目被做成卡片？
+
+开一个 [issue](https://github.com/PR-JHL/gh-zh-card/issues/new?template=card-request.yml)，模板会问三件事：仓库地址、为什么值得被看到、想突出的点。
+
+**不用是作者本人**——你在用的项目也可以提。
+
 ## 设计原则
 
 1. **数字必须真。** 卡片上唯一能被一眼验证的就是 stars 和 license，编一次就没人信了。
