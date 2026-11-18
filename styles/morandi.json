@@ -1,0 +1,63 @@
+{
+  "id": "morandi",
+  "name": "Morandi",
+  "name_zh": "莫兰迪",
+  "family": "gen1-print",
+  "mood": [
+    "灰调",
+    "低饱和",
+    "静物",
+    "温柔的克制"
+  ],
+  "palette": {
+    "bg_top": "#EFE9DE",
+    "bg_bottom": "#DCD3C3",
+    "surface": "#ECE5D9",
+    "surface_alt": "#F4EFE6",
+    "text": "#35322C",
+    "text_dim": "#5D574D",
+    "text_faint": "#6C6459",
+    "accent": "#8C7361",
+    "accent_2": "#6F8378",
+    "accent_3": "#A88A7C",
+    "good": "#6E8A6B",
+    "line": "#C9BEAC"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "accent_2",
+    "glow": 0.06,
+    "vignette": 0.06
+  },
+  "type": {
+    "title_scale": 0.98,
+    "lead": 1.38,
+    "mono_install": false
+  },
+  "motifs": [
+    "灰调色块叠影",
+    "极细分割线",
+    "柔边",
+    "无强对比"
+  ],
+  "avoid": [
+    "纯白纯黑",
+    "高饱和撞色",
+    "锐利硬阴影",
+    "荧光色"
+  ],
+  "use_for": [
+    "生活/情绪类产品",
+    "设计随笔",
+    "女性向工具",
+    "阅读与收藏"
+  ],
+  "refs": [
+    "乔治·莫兰迪灰调静物",
+    "博洛尼亚工作室的蛋彩灰",
+    "意大利 1950s 杂志内页"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "id": "constructivism",
+  "name": "Constructivism",
+  "name_zh": "俄式构成主义",
+  "family": "gen1-print",
+  "mood": [
+    "宣传鼓动",
+    "斜切构图",
+    "印刷粗糙",
+    "红与黑"
+  ],
+  "palette": {
+    "bg_top": "#EFE5CB",
+    "bg_bottom": "#DCC9A3",
+    "surface": "#E7DABB",
+    "surface_alt": "#F2E8D0",
+    "text": "#17120E",
+    "text_dim": "#4E4132",
+    "text_faint": "#6B5B46",
+    "accent": "#BE1622",
+    "accent_2": "#1A1A1A",
+    "accent_3": "#D39A17",
+    "good": "#4F6B44",
+    "line": "#B49B72"
+  },
+  "decor": {
+    "grid": 0.0,
+    "scanlines": 0,
+    "corner_marks": true,
+    "frame": true,
+    "top_stripe": "accent",
+    "glow": 0.0,
+    "vignette": 0.1
+  },
+  "type": {
+    "title_scale": 1.0,
+    "lead": 1.28,
+    "mono_install": false
+  },
+  "motifs": [
+    "粗斜杠指向",
+    "超大号数字",
+    "红黑双色套印",
+    "纸面颗粒"
+  ],
+  "avoid": [
+    "圆润几何",
+    "渐变光晕",
+    "冷色主调",
+    "轻飘的细字"
+  ],
+  "use_for": [
+    "宣言式文章",
+    "里程碑发布",
+    "社区动员",
+    "强立场技术评论"
+  ],
+  "refs": [
+    "Rodchenko《Книга о книгах》封面",
+    "Rosta 窗口宣传画",
+    "El Lissitzky《用红色楔子击打白色》"
+  ]
+}

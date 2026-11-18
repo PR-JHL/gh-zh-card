@@ -1,0 +1,63 @@
+{
+  "id": "lofoten-aurora",
+  "name": "Lofoten Aurora",
+  "name_zh": "罗弗敦极光",
+  "family": "landscape-photo",
+  "mood": [
+    "极夜",
+    "荧光绿极光弧",
+    "雪蓝",
+    "寒冷而安静"
+  ],
+  "palette": {
+    "bg_top": "#06171C",
+    "bg_bottom": "#10342E",
+    "surface": "#0A221E",
+    "surface_alt": "#14483F",
+    "text": "#EAFCF3",
+    "text_dim": "#9BD6C2",
+    "text_faint": "#75AC9A",
+    "accent": "#46F2AE",
+    "accent_2": "#7FB8FF",
+    "accent_3": "#C9F8E2",
+    "good": "#8CE8C0",
+    "line": "#16453C"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.24,
+    "vignette": 0.12
+  },
+  "type": {
+    "title_scale": 1.0,
+    "lead": 1.36,
+    "mono_install": false
+  },
+  "motifs": [
+    "极光弧横过夜空",
+    "雪脊的冷蓝阴影",
+    "渔屋的暖窗格",
+    "星点与山脊剪影"
+  ],
+  "avoid": [
+    "紫色极光辉光",
+    "霓虹招牌",
+    "死黑天空",
+    "雪地发灰"
+  ],
+  "use_for": [
+    "自然/户外类项目",
+    "摄影与影像工具",
+    "冬季旅行产品",
+    "需要呼吸感的封面"
+  ],
+  "refs": [
+    "挪威罗弗敦群岛 Reine，1 月 KP5 极光爆发、无月夜",
+    "Hamnøy 桥向北的极光弧与雪面反射",
+    "极光被雪面漫反射成荧光绿，天空留墨绿底"
+  ]
+}

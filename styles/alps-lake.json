@@ -1,0 +1,62 @@
+{
+  "id": "alps-lake",
+  "name": "Alps Lake",
+  "name_zh": "阿尔卑斯湖",
+  "family": "landscape-photo",
+  "mood": [
+    "清晨无风",
+    "松林墨绿",
+    "湖蓝绿",
+    "一层薄雾"
+  ],
+  "palette": {
+    "bg_top": "#0E2A26",
+    "bg_bottom": "#14504E",
+    "surface": "#12463F",
+    "surface_alt": "#195E56",
+    "text": "#EEF8F4",
+    "text_dim": "#A0D5C9",
+    "text_faint": "#85B0A4",
+    "accent": "#7BE0D2",
+    "accent_2": "#E9C97F",
+    "accent_3": "#DFF5EF",
+    "good": "#6FD8A0",
+    "line": "#1E5C56"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.2,
+    "vignette": 0.1
+  },
+  "type": {
+    "title_scale": 1.0,
+    "lead": 1.36,
+    "mono_install": false
+  },
+  "motifs": [
+    "松林倒影的竖条",
+    "湖面的一层镜雾",
+    "码头木桩",
+    "远山的雪线"
+  ],
+  "avoid": [
+    "旅游明信片蓝",
+    "灰绿浑浊",
+    "过度锐化 HDR",
+    "棕调复古"
+  ],
+  "use_for": [
+    "稳定/可靠性类内容",
+    "自然与户外品牌",
+    "需要静气的封面"
+  ],
+  "refs": [
+    "意大利 Lago di Braies 清晨无风，多洛米蒂松林倒影",
+    "湖水绿松石色 + 松林墨绿 + 晨雾贴水面",
+    "远山雪线被侧光照亮的一线暖金"
+  ]
+}

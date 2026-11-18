@@ -1,0 +1,62 @@
+{
+  "id": "provence-lavender",
+  "name": "Provence Lavender",
+  "name_zh": "普罗旺斯薰衣草",
+  "family": "landscape-photo",
+  "mood": [
+    "日落前一小时",
+    "薰衣草紫",
+    "麦田黄",
+    "石灰白"
+  ],
+  "palette": {
+    "bg_top": "#C9C2E6",
+    "bg_bottom": "#F0E7CE",
+    "surface": "#F7F0E0",
+    "surface_alt": "#E6DBC4",
+    "text": "#241E33",
+    "text_dim": "#4E4560",
+    "text_faint": "#6E6480",
+    "accent": "#7B5EA7",
+    "accent_2": "#C9A24A",
+    "accent_3": "#FBF6EA",
+    "good": "#6A8F4E",
+    "line": "#D8CFC4"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.04,
+    "vignette": 0.04
+  },
+  "type": {
+    "title_scale": 0.98,
+    "lead": 1.4,
+    "mono_install": false
+  },
+  "motifs": [
+    "薰衣草行垄的透视线",
+    "行垄尽头的一株树",
+    "麦田的金色块面",
+    "石灰岩白屋"
+  ],
+  "avoid": [
+    "粉紫美妆感",
+    "饱和度过高的紫",
+    "奶油复古滤镜",
+    "花纹装饰"
+  ],
+  "use_for": [
+    "生活方式/审美类内容",
+    "设计工具介绍",
+    "礼物与节日物料"
+  ],
+  "refs": [
+    "法国普罗旺斯 Valensole 高原，6 月底日落前 1 小时",
+    "薰衣草行垄尽头一株孤立杏树，麦田金黄 + 石灰岩白屋",
+    "低角度阳光把花穗压成紫罗兰，天空退成淡紫"
+  ]
+}

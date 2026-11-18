@@ -1,0 +1,62 @@
+{
+  "id": "tundra-autumn",
+  "name": "Tundra Autumn",
+  "name_zh": "苔原秋色",
+  "family": "landscape-photo",
+  "mood": [
+    "九月初秋",
+    "铁锈红矮桦",
+    "酒红越橘",
+    "苔绿"
+  ],
+  "palette": {
+    "bg_top": "#152320",
+    "bg_bottom": "#5A2A2C",
+    "surface": "#4E2528",
+    "surface_alt": "#632F31",
+    "text": "#FBF0E8",
+    "text_dim": "#DDAF9E",
+    "text_faint": "#B98772",
+    "accent": "#E8623C",
+    "accent_2": "#7F9E63",
+    "accent_3": "#F0B98A",
+    "good": "#86B36A",
+    "line": "#3C2022"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.16,
+    "vignette": 0.1
+  },
+  "type": {
+    "title_scale": 1.0,
+    "lead": 1.36,
+    "mono_install": false
+  },
+  "motifs": [
+    "贴地的矮桦毯",
+    "苔原的水平色带",
+    "结冰的小水洼",
+    "低空平射的秋光"
+  ],
+  "avoid": [
+    "红绿圣诞配色",
+    "灰褐荒原",
+    "过度饱和的酒红",
+    "雪景处理"
+  ],
+  "use_for": [
+    "深秋/收束型叙事",
+    "清冷静态的内容",
+    "北欧相关产品"
+  ],
+  "refs": [
+    "芬兰拉普兰 Kilpisjärvi 苔原，9 月初秋阴天午后",
+    "苔原秋色：矮桦铁锈红、越橘酒红、苔藓绿并存",
+    "低空平射的光把苔原压成一条条色带"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "id": "sakura-wafu",
+  "name": "Sakura Wafu",
+  "name_zh": "和风樱花",
+  "family": "gen1-print",
+  "mood": [
+    "春信",
+    "淡樱",
+    "和纸",
+    "轻盈"
+  ],
+  "palette": {
+    "bg_top": "#FDF6F3",
+    "bg_bottom": "#F2E2E4",
+    "surface": "#FBF1EF",
+    "surface_alt": "#F6E6E6",
+    "text": "#2E2724",
+    "text_dim": "#5E504D",
+    "text_faint": "#7D6B67",
+    "accent": "#C46A85",
+    "accent_2": "#4A6E8A",
+    "accent_3": "#C9A227",
+    "good": "#6E8A5E",
+    "line": "#DFC6C6"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": true,
+    "top_stripe": "accent",
+    "glow": 0.04,
+    "vignette": 0.1
+  },
+  "type": {
+    "title_scale": 0.96,
+    "lead": 1.4,
+    "mono_install": false
+  },
+  "motifs": [
+    "五瓣樱剪影",
+    "金箔细线",
+    "竖排小字题签",
+    "淡墨枝干"
+  ],
+  "avoid": [
+    "高饱和红",
+    "深色底",
+    "粗黑描边",
+    "拥挤布局"
+  ],
+  "use_for": [
+    "生活/送礼类工具",
+    "轻量笔记应用",
+    "节日专题",
+    "面向大众的温和介绍"
+  ],
+  "refs": [
+    "京都岚山樱花",
+    "和纸与金箔",
+    "《源氏物语绘卷》配色"
+  ]
+}

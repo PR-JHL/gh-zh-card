@@ -1,0 +1,63 @@
+{
+  "id": "circuit-board",
+  "name": "Circuit Board",
+  "name_zh": "电路板",
+  "family": "gen1-print",
+  "mood": [
+    "阻焊绿",
+    "沉金",
+    "丝印白",
+    "焊点"
+  ],
+  "palette": {
+    "bg_top": "#05110B",
+    "bg_bottom": "#0D2A1A",
+    "surface": "#103520",
+    "surface_alt": "#17452B",
+    "text": "#E8F5E9",
+    "text_dim": "#94BFA1",
+    "text_faint": "#74A184",
+    "accent": "#3BE07B",
+    "accent_2": "#D9A441",
+    "accent_3": "#FF5D3B",
+    "good": "#3BE07B",
+    "line": "#1F5233"
+  },
+  "decor": {
+    "grid": 0.1,
+    "scanlines": 0.03,
+    "corner_marks": true,
+    "frame": true,
+    "top_stripe": "accent",
+    "glow": 0.16,
+    "vignette": 0.22
+  },
+  "type": {
+    "title_scale": 0.98,
+    "lead": 1.32,
+    "mono_install": true
+  },
+  "motifs": [
+    "走线折角 45°",
+    "焊盘圆环",
+    "丝印元件框",
+    "过孔点阵"
+  ],
+  "avoid": [
+    "粉彩色",
+    "大面积留白",
+    "手绘插画",
+    "渐变光斑"
+  ],
+  "use_for": [
+    "嵌入式/硬件项目",
+    "底层库",
+    "协议实现",
+    "性能优化记录"
+  ],
+  "refs": [
+    "80 年代单面板 PCB 阻焊绿",
+    "沉金焊盘（ENIG）",
+    "元件丝印白字"
+  ]
+}

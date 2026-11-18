@@ -1,0 +1,63 @@
+{
+  "id": "blueprint",
+  "name": "Blueprint",
+  "name_zh": "工程蓝图",
+  "family": "gen1-print",
+  "mood": [
+    "蓝晒",
+    "白线",
+    "图框",
+    "施工图"
+  ],
+  "palette": {
+    "bg_top": "#081B2E",
+    "bg_bottom": "#123A5E",
+    "surface": "#0E2C47",
+    "surface_alt": "#164668",
+    "text": "#EAF4FF",
+    "text_dim": "#9FC0DC",
+    "text_faint": "#7FA3C2",
+    "accent": "#8FD3FF",
+    "accent_2": "#FFD25E",
+    "accent_3": "#FF7A6B",
+    "good": "#6FE0B0",
+    "line": "#25537A"
+  },
+  "decor": {
+    "grid": 0.14,
+    "scanlines": 0,
+    "corner_marks": true,
+    "frame": true,
+    "top_stripe": "accent_2",
+    "glow": 0.18,
+    "vignette": 0.2
+  },
+  "type": {
+    "title_scale": 0.96,
+    "lead": 1.34,
+    "mono_install": true
+  },
+  "motifs": [
+    "细密方格纸",
+    "图框与图签",
+    "尺寸标注线",
+    "等宽英文小字"
+  ],
+  "avoid": [
+    "暖色主调",
+    "圆润图形",
+    "照片",
+    "大段彩色块"
+  ],
+  "use_for": [
+    "架构图/系统设计",
+    "硬件项目",
+    "接口与协议说明",
+    "工程复盘"
+  ],
+  "refs": [
+    "蓝晒图 cyanotype",
+    "工程制图 1:100 图框与图签",
+    "设计院施工图蓝本"
+  ]
+}

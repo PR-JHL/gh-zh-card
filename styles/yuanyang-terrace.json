@@ -1,0 +1,62 @@
+{
+  "id": "yuanyang-terrace",
+  "name": "Yuanyang Terrace",
+  "name_zh": "元阳梯田",
+  "family": "landscape-photo",
+  "mood": [
+    "日出前",
+    "水镜银",
+    "泥埂褐",
+    "一线金"
+  ],
+  "palette": {
+    "bg_top": "#16283A",
+    "bg_bottom": "#3E5062",
+    "surface": "#33434C",
+    "surface_alt": "#4A3A2E",
+    "text": "#F3F6F5",
+    "text_dim": "#B3C3C9",
+    "text_faint": "#9FB3BA",
+    "accent": "#FFC85C",
+    "accent_2": "#B48048",
+    "accent_3": "#E8EEF0",
+    "good": "#7FD3A8",
+    "line": "#485C68"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.16,
+    "vignette": 0.1
+  },
+  "type": {
+    "title_scale": 0.96,
+    "lead": 1.38,
+    "mono_install": false
+  },
+  "motifs": [
+    "等高线的弧状田埂",
+    "水面倒映的天光",
+    "晨雾缠绕山腰",
+    "田埂上的一个人影"
+  ],
+  "avoid": [
+    "油画感高饱和",
+    "雾把画面压灰",
+    "金色滤镜",
+    "密集纹理堆叠"
+  ],
+  "use_for": [
+    "长文与人文叙事",
+    "农业/乡土题材",
+    "需要静气的封面"
+  ],
+  "refs": [
+    "云南元阳多依树梯田，日出前 30 分钟无雾晨",
+    "哈尼梯田水镜反射银灰天光，田埂泥褐压住画面",
+    "第一缕阳光落在一线田埂上的金色边"
+  ]
+}

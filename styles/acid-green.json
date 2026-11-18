@@ -1,0 +1,63 @@
+{
+  "id": "acid-green",
+  "name": "Acid Green",
+  "name_zh": "酸性绿",
+  "family": "gen1-print",
+  "mood": [
+    "荧光绿",
+    "反设计",
+    "rave",
+    "刺眼但清醒"
+  ],
+  "palette": {
+    "bg_top": "#07090A",
+    "bg_bottom": "#141A12",
+    "surface": "#1D2819",
+    "surface_alt": "#29361F",
+    "text": "#EBFFE4",
+    "text_dim": "#A9C79C",
+    "text_faint": "#84A078",
+    "accent": "#BFFF00",
+    "accent_2": "#FF2AC8",
+    "accent_3": "#00E5FF",
+    "good": "#BFFF00",
+    "line": "#2C3A26"
+  },
+  "decor": {
+    "grid": 0.1,
+    "scanlines": 0.09,
+    "corner_marks": true,
+    "frame": true,
+    "top_stripe": "accent",
+    "glow": 0.2,
+    "vignette": 0.22
+  },
+  "type": {
+    "title_scale": 1.02,
+    "lead": 1.33,
+    "mono_install": true
+  },
+  "motifs": [
+    "荧光绿大面积",
+    "拉伸/扭曲字",
+    "全大写小标签",
+    "像素噪点"
+  ],
+  "avoid": [
+    "米色纸感",
+    "柔和渐变",
+    "衬线体",
+    "稳妥的居中排版"
+  ],
+  "use_for": [
+    "实验性工具",
+    "CLI/终端产品",
+    "电子音乐相关",
+    "网页技术硬核文"
+  ],
+  "refs": [
+    "The Designers Republic 为 Warp Records 做的封面",
+    "90 年代 rave 传单",
+    "MS Paint 荧光绿"
+  ]
+}

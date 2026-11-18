@@ -1,0 +1,62 @@
+{
+  "id": "patagonia-granite",
+  "name": "Patagonia Granite",
+  "name_zh": "帕塔哥尼亚花岗岩",
+  "family": "landscape-photo",
+  "mood": [
+    "风暴云",
+    "冷灰花岗岩",
+    "冰川青",
+    "压迫但通透"
+  ],
+  "palette": {
+    "bg_top": "#16283A",
+    "bg_bottom": "#2A5666",
+    "surface": "#1F3B4A",
+    "surface_alt": "#2A5062",
+    "text": "#EDF5F8",
+    "text_dim": "#A9C5D0",
+    "text_faint": "#96B4C0",
+    "accent": "#5FC9C0",
+    "accent_2": "#D89A6A",
+    "accent_3": "#BFE6E0",
+    "good": "#6FD8A8",
+    "line": "#2B4E5C"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.18,
+    "vignette": 0.14
+  },
+  "type": {
+    "title_scale": 0.98,
+    "lead": 1.36,
+    "mono_install": false
+  },
+  "motifs": [
+    "层积云的横向条带",
+    "花岗岩的垂直节理",
+    "冰川湖的乳青",
+    "风暴前的一道侧光"
+  ],
+  "avoid": [
+    "灰蒙蒙一片",
+    "暖棕复古",
+    "雪山明信片蓝",
+    "过度 HDR"
+  ],
+  "use_for": [
+    "基础设施/可靠性叙事",
+    "硬核工程封面",
+    "极地科考内容"
+  ],
+  "refs": [
+    "智利百内国家公园 Torres del Paine 三塔峰，午后风暴云压顶",
+    "阿根廷 Fitz Roy 与 Capri 湖，层积云滤下的冷灰岩 + 冰川青",
+    "冰川湖的乳青色来自岩粉悬浮（glacial flour）"
+  ]
+}

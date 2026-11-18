@@ -2,6 +2,7 @@
   "id": "obsidian",
   "name": "Obsidian",
   "name_zh": "曜石",
+  "family": "gen1-print",
   "mood": ["专注", "低光", "紫色高级感", "编辑器感"],
   "palette": {
     "bg_top": "#1B1926",

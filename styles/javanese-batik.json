@@ -1,0 +1,63 @@
+{
+  "id": "javanese-batik",
+  "name": "Javanese Batik",
+  "name_zh": "爪哇蜡染",
+  "family": "gen1-print",
+  "mood": [
+    "靛蓝",
+    "soga 棕",
+    "蜡裂纹",
+    "手绘纹样"
+  ],
+  "palette": {
+    "bg_top": "#F1E9D6",
+    "bg_bottom": "#DCCFB2",
+    "surface": "#E8DCC2",
+    "surface_alt": "#F4EDDD",
+    "text": "#1E2430",
+    "text_dim": "#4A4438",
+    "text_faint": "#6B624E",
+    "accent": "#244A73",
+    "accent_2": "#7A4020",
+    "accent_3": "#6E8CB0",
+    "good": "#4A6B45",
+    "line": "#C3B294"
+  },
+  "decor": {
+    "grid": 0.05,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": true,
+    "top_stripe": "accent",
+    "glow": 0.0,
+    "vignette": 0.1
+  },
+  "type": {
+    "title_scale": 0.95,
+    "lead": 1.38,
+    "mono_install": false
+  },
+  "motifs": [
+    "parang 斜纹",
+    "蜡裂细线",
+    "靛蓝圆点底",
+    "棕白双色套印"
+  ],
+  "avoid": [
+    "荧光色",
+    "纯黑背景",
+    "极简白页",
+    "无纹理的平涂"
+  ],
+  "use_for": [
+    "多语言/东南亚相关",
+    "社区文化项目",
+    "手工与工艺类",
+    "需要温度的文档"
+  ],
+  "refs": [
+    "爪哇蜡染 batik tulis",
+    "印尼 soga 棕与靛蓝",
+    "parang 纹样"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "id": "dunhuang",
+  "name": "Dunhuang Mural",
+  "name_zh": "敦煌壁画",
+  "family": "gen1-print",
+  "mood": [
+    "矿物颜料",
+    "氧化土红",
+    "石青石绿",
+    "壁面剥落"
+  ],
+  "palette": {
+    "bg_top": "#EADDBE",
+    "bg_bottom": "#D3BE96",
+    "surface": "#E1CFA9",
+    "surface_alt": "#F0E5C9",
+    "text": "#2A1C12",
+    "text_dim": "#57432C",
+    "text_faint": "#6A5636",
+    "accent": "#A6492E",
+    "accent_2": "#2F5D8C",
+    "accent_3": "#C0981F",
+    "good": "#4F7350",
+    "line": "#B69A6C"
+  },
+  "decor": {
+    "grid": 0.03,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": true,
+    "top_stripe": "accent",
+    "glow": 0.0,
+    "vignette": 0.2
+  },
+  "type": {
+    "title_scale": 0.96,
+    "lead": 1.37,
+    "mono_install": false
+  },
+  "motifs": [
+    "藻井同心方纹",
+    "土红勾边",
+    "剥落斑驳肌理",
+    "飘带曲线"
+  ],
+  "avoid": [
+    "荧光色",
+    "纯黑",
+    "现代扁平图标",
+    "大面积冷白"
+  ],
+  "use_for": [
+    "文化/非遗类项目",
+    "中文内容美化",
+    "教育与科普",
+    "数据可视化封面"
+  ],
+  "refs": [
+    "莫高窟 257 窟九色鹿",
+    "壁画矿物颜料（石青/石绿/土红）",
+    "敦煌藻井图案"
+  ]
+}

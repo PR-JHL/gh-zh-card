@@ -1,0 +1,63 @@
+{
+  "id": "bauhaus",
+  "name": "Bauhaus",
+  "name_zh": "包豪斯",
+  "family": "gen1-print",
+  "mood": [
+    "三原色",
+    "手工纸感",
+    "几何拼贴",
+    "工坊"
+  ],
+  "palette": {
+    "bg_top": "#F1EADA",
+    "bg_bottom": "#DFD3BC",
+    "surface": "#EBE3D0",
+    "surface_alt": "#F5EEDF",
+    "text": "#1B1A17",
+    "text_dim": "#524C40",
+    "text_faint": "#6F6859",
+    "accent": "#C4342B",
+    "accent_2": "#1F4E9C",
+    "accent_3": "#E0A81E",
+    "good": "#3F7D4E",
+    "line": "#BCAE93"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": true,
+    "top_stripe": "accent_3",
+    "glow": 0.0,
+    "vignette": 0.0
+  },
+  "type": {
+    "title_scale": 0.98,
+    "lead": 1.34,
+    "mono_install": false
+  },
+  "motifs": [
+    "圆/方/三角基本形",
+    "对角线分割",
+    "三原色小块",
+    "手排无衬线"
+  ],
+  "avoid": [
+    "写实插画",
+    "渐变色",
+    "装饰花边",
+    "超过四个色相"
+  ],
+  "use_for": [
+    "设计工具介绍",
+    "字体/图形项目",
+    "创意工作流",
+    "课程与教程封面"
+  ],
+  "refs": [
+    "包豪斯魏玛校舍标识",
+    "Herbert Bayer 通用字体提案",
+    "Josef Albers《向正方形致敬》"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "id": "pop-art",
+  "name": "Pop Art",
+  "name_zh": "波普艺术",
+  "family": "gen1-print",
+  "mood": [
+    "Ben-Day 网点",
+    "漫画分镜",
+    "高饱和",
+    "消费符号"
+  ],
+  "palette": {
+    "bg_top": "#FFFBEC",
+    "bg_bottom": "#F4E9CE",
+    "surface": "#FFF6DE",
+    "surface_alt": "#FFE9B8",
+    "text": "#141414",
+    "text_dim": "#4C483F",
+    "text_faint": "#6F6A5C",
+    "accent": "#E03A2B",
+    "accent_2": "#1E63B0",
+    "accent_3": "#FFCE1F",
+    "good": "#1E9E5A",
+    "line": "#141414"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0.03,
+    "corner_marks": false,
+    "frame": true,
+    "top_stripe": "accent",
+    "glow": 0.0,
+    "vignette": 0.05
+  },
+  "type": {
+    "title_scale": 1.02,
+    "lead": 1.31,
+    "mono_install": false
+  },
+  "motifs": [
+    "粗黑轮廓",
+    "网点底纹",
+    "爆炸形角标",
+    "拟声词色块"
+  ],
+  "avoid": [
+    "灰调",
+    "细衬线正文",
+    "渐变",
+    "安静排版"
+  ],
+  "use_for": [
+    "消费级产品",
+    "营销/增长案例",
+    "社区爆款复盘",
+    "讲给非技术人听的卡"
+  ],
+  "refs": [
+    "Roy Lichtenstein 的 Ben-Day 网点",
+    "Andy Warhol 玛丽莲丝网印",
+    "60 年代漫画分镜"
+  ]
+}

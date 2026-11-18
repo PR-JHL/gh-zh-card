@@ -1,0 +1,62 @@
+{
+  "id": "volcanic-lava",
+  "name": "Volcanic Lava",
+  "name_zh": "火山熔岩",
+  "family": "landscape-photo",
+  "mood": [
+    "夜间喷发",
+    "玄武岩黑",
+    "熔岩橙红",
+    "硫磺黄"
+  ],
+  "palette": {
+    "bg_top": "#1B1024",
+    "bg_bottom": "#4E1A12",
+    "surface": "#2E1614",
+    "surface_alt": "#451C16",
+    "text": "#FFF2EA",
+    "text_dim": "#E29A86",
+    "text_faint": "#B9705C",
+    "accent": "#FF4D1F",
+    "accent_2": "#FFC61A",
+    "accent_3": "#FF9A6B",
+    "good": "#F7C05A",
+    "line": "#5A2418"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.18,
+    "vignette": 0.14
+  },
+  "type": {
+    "title_scale": 1.0,
+    "lead": 1.34,
+    "mono_install": false
+  },
+  "motifs": [
+    "熔岩流的发光裂缝",
+    "冷却结壳的黑色多边形",
+    "上升的热气流扰动",
+    "火山口的橙光"
+  ],
+  "avoid": [
+    "灾难片海报红",
+    "死黑背景",
+    "紫粉科幻",
+    "烟雾把画面糊住"
+  ],
+  "use_for": [
+    "高温/性能/压测等隐喻",
+    "告警与风险类封面",
+    "硬核技术内容"
+  ],
+  "refs": [
+    "冰岛 Fagradalsfjall 2021 年喷发，夜间拍摄",
+    "熔岩流新鲜表面橙红、冷却玄武岩近黑、喷气孔周围硫磺黄",
+    "热气流让熔岩边缘产生空气扰动"
+  ]
+}

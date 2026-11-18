@@ -1,0 +1,62 @@
+{
+  "id": "uyuni-mirror",
+  "name": "Uyuni Mirror",
+  "name_zh": "乌尤尼镜面",
+  "family": "landscape-photo",
+  "mood": [
+    "天空之镜",
+    "无风",
+    "苍白通透",
+    "一线落日"
+  ],
+  "palette": {
+    "bg_top": "#A9CBE4",
+    "bg_bottom": "#E2EDF2",
+    "surface": "#F4F9FB",
+    "surface_alt": "#DCEAF0",
+    "text": "#10222E",
+    "text_dim": "#3A5A6B",
+    "text_faint": "#557A8C",
+    "accent": "#D8542E",
+    "accent_2": "#23608A",
+    "accent_3": "#E8A06A",
+    "good": "#2E8B6E",
+    "line": "#C2D8E2"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.0,
+    "vignette": 0.03
+  },
+  "type": {
+    "title_scale": 0.98,
+    "lead": 1.4,
+    "mono_install": false
+  },
+  "motifs": [
+    "水天一线的镜面接缝",
+    "六边形盐壳裂纹",
+    "极小的人影比例",
+    "地平线一线暖橙"
+  ],
+  "avoid": [
+    "饱和蓝紫渐变",
+    "毛玻璃卡片",
+    "灰蒙雾",
+    "重装饰"
+  ],
+  "use_for": [
+    "极简/留白型产品",
+    "摄影集与画册",
+    "需要大量留白的封面"
+  ],
+  "refs": [
+    "玻利维亚乌尤尼盐沼 Salar de Uyuni，雨季清晨无风镜面",
+    "六边形盐壳与天空镜像，地平线只剩一线落日橙",
+    "天空倒影比实景更亮，近地面处发白"
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "id": "bioluminescent-sea",
+  "name": "Bioluminescent Sea",
+  "name_zh": "深海生物荧光",
+  "family": "landscape-photo",
+  "mood": [
+    "深靛",
+    "生物荧光青",
+    "无人工光",
+    "安静的恐惧"
+  ],
+  "palette": {
+    "bg_top": "#04101C",
+    "bg_bottom": "#0A2C3A",
+    "surface": "#082430",
+    "surface_alt": "#0E3442",
+    "text": "#E6FBF8",
+    "text_dim": "#86C9CC",
+    "text_faint": "#61919C",
+    "accent": "#35F0E0",
+    "accent_2": "#3B5BE0",
+    "accent_3": "#A8FBF2",
+    "good": "#8FF7D0",
+    "line": "#123A4A"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.22,
+    "vignette": 0.14
+  },
+  "type": {
+    "title_scale": 1.0,
+    "lead": 1.36,
+    "mono_install": false
+  },
+  "motifs": [
+    "悬浮的光点群落",
+    "被浪打亮的荧光带",
+    "深海无方向的暗",
+    "极细的浮游颗粒"
+  ],
+  "avoid": [
+    "科幻 HUD 网格",
+    "霓虹紫粉",
+    "纯黑死底",
+    "发光过度像霓虹灯"
+  ],
+  "use_for": [
+    "AI/神经网络类比喻",
+    "夜间模式产品",
+    "科研与探索内容"
+  ],
+  "refs": [
+    "加州蒙特雷湾 Monterey Bay 深夜垂直迁移层",
+    "甲藻 Noctiluca scintillans 被浪打出的荧光青",
+    "水下 20 m 无人工光，背景只剩深靛"
+  ]
+}

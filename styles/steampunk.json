@@ -1,0 +1,63 @@
+{
+  "id": "steampunk",
+  "name": "Steampunk",
+  "name_zh": "蒸汽朋克",
+  "family": "gen1-print",
+  "mood": [
+    "黄铜",
+    "煤烟",
+    "齿轮",
+    "维多利亚"
+  ],
+  "palette": {
+    "bg_top": "#160F0A",
+    "bg_bottom": "#2C1E14",
+    "surface": "#3B2B1D",
+    "surface_alt": "#48331F",
+    "text": "#F3E4C6",
+    "text_dim": "#C0A57C",
+    "text_faint": "#9C8259",
+    "accent": "#C9973F",
+    "accent_2": "#B65A2C",
+    "accent_3": "#6FA890",
+    "good": "#8FA85C",
+    "line": "#4A3526"
+  },
+  "decor": {
+    "grid": 0.04,
+    "scanlines": 0.03,
+    "corner_marks": true,
+    "frame": true,
+    "top_stripe": "accent",
+    "glow": 0.2,
+    "vignette": 0.34
+  },
+  "type": {
+    "title_scale": 0.96,
+    "lead": 1.36,
+    "mono_install": false
+  },
+  "motifs": [
+    "黄铜铆钉边",
+    "齿轮暗纹",
+    "羊皮纸标签",
+    "做旧铜绿"
+  ],
+  "avoid": [
+    "霓虹色",
+    "扁平矢量",
+    "纯白背景",
+    "现代无衬线"
+  ],
+  "use_for": [
+    "硬件改造",
+    "老系统考古",
+    "机械/自动化",
+    "故事化技术叙述"
+  ],
+  "refs": [
+    "维多利亚黄铜气压表",
+    "《差分机》",
+    "蒸汽机车铭牌"
+  ]
+}

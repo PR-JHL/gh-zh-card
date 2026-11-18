@@ -1,0 +1,62 @@
+{
+  "id": "australia-red-centre",
+  "name": "Australia Red Centre",
+  "name_zh": "澳洲红土中心",
+  "family": "landscape-photo",
+  "mood": [
+    "日落最后十分钟",
+    "赭红砂岩",
+    "火焰橙",
+    "桉树灰绿"
+  ],
+  "palette": {
+    "bg_top": "#241A3E",
+    "bg_bottom": "#6B2418",
+    "surface": "#5E2318",
+    "surface_alt": "#772C1C",
+    "text": "#FFF3EA",
+    "text_dim": "#E8BEAC",
+    "text_faint": "#C89982",
+    "accent": "#FF7A29",
+    "accent_2": "#7E9B7A",
+    "accent_3": "#FFC98A",
+    "good": "#8FD48A",
+    "line": "#4A1E16"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.16,
+    "vignette": 0.12
+  },
+  "type": {
+    "title_scale": 1.0,
+    "lead": 1.34,
+    "mono_install": false
+  },
+  "motifs": [
+    "砂岩的横向层理",
+    "桉树的细长灰绿枝",
+    "spinifex 草的金色丛",
+    "地平线的紫调"
+  ],
+  "avoid": [
+    "橙紫渐变（AI 默认日落）",
+    "灰褐色",
+    "星空调色",
+    "沙漠荒凉刻板印象"
+  ],
+  "use_for": [
+    "变化/迁移类叙事",
+    "能源与温度相关数据",
+    "需要存在感的封面"
+  ],
+  "refs": [
+    "澳大利亚北领地 Uluru 日落最后 10 分钟",
+    "红土中心 spinifex 草原与桉树灰绿，天空转深紫",
+    "火烧云把砂岩染成火焰橙，阴影是深赭"
+  ]
+}

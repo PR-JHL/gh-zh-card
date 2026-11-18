@@ -1,0 +1,62 @@
+{
+  "id": "sossusvlei-dune",
+  "name": "Sossusvlei Dune",
+  "name_zh": "索苏斯维利沙丘",
+  "family": "landscape-photo",
+  "mood": [
+    "日出侧光",
+    "铁锈红沙",
+    "钴蓝天空",
+    "硬朗阴影"
+  ],
+  "palette": {
+    "bg_top": "#0E2A55",
+    "bg_bottom": "#7A2F14",
+    "surface": "#7A3A20",
+    "surface_alt": "#8E4526",
+    "text": "#FFF7EE",
+    "text_dim": "#F0C6A2",
+    "text_faint": "#D3A177",
+    "accent": "#FFA24F",
+    "accent_2": "#6FB4F0",
+    "accent_3": "#FFD79A",
+    "good": "#79D98F",
+    "line": "#4A2314"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.16,
+    "vignette": 0.1
+  },
+  "type": {
+    "title_scale": 1.0,
+    "lead": 1.32,
+    "mono_install": false
+  },
+  "motifs": [
+    "沙丘脊线的明暗切分",
+    "沙纹的平行细线",
+    "干涸盐沼白斑",
+    "逆光下的沙尘"
+  ],
+  "avoid": [
+    "橙色整体滤镜",
+    "灰色阴影",
+    "柔焦雾化",
+    "沙漠日落套路图"
+  ],
+  "use_for": [
+    "旅行/地理类内容",
+    "数据可视化封面",
+    "需要暖冷对比的物料"
+  ],
+  "refs": [
+    "纳米比亚索苏斯维利 Sossusvlei 45 号沙丘，日出后 20 分钟侧逆光",
+    "纳米布沙漠：钴蓝天顶 + 铁锈红沙脊 + 深棕背光面",
+    "Deadvlei 白色盐沼与枯树的黑影"
+  ]
+}

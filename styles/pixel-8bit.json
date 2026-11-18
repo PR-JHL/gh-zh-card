@@ -1,0 +1,63 @@
+{
+  "id": "pixel-8bit",
+  "name": "8-bit Pixel",
+  "name_zh": "8bit 像素",
+  "family": "gen1-print",
+  "mood": [
+    "像素格",
+    "调色板受限",
+    "游戏机",
+    "硬边"
+  ],
+  "palette": {
+    "bg_top": "#171A2B",
+    "bg_bottom": "#242842",
+    "surface": "#2B3050",
+    "surface_alt": "#343A5E",
+    "text": "#FFF1E8",
+    "text_dim": "#B8BEDC",
+    "text_faint": "#959CBE",
+    "accent": "#FF004D",
+    "accent_2": "#29ADFF",
+    "accent_3": "#FFEC27",
+    "good": "#00E436",
+    "line": "#3E4570"
+  },
+  "decor": {
+    "grid": 0.06,
+    "scanlines": 0.05,
+    "corner_marks": false,
+    "frame": true,
+    "top_stripe": "accent",
+    "glow": 0.12,
+    "vignette": 0.18
+  },
+  "type": {
+    "title_scale": 1.0,
+    "lead": 1.3,
+    "mono_install": true
+  },
+  "motifs": [
+    "整数倍像素块",
+    "硬边无抗锯齿",
+    "小血条/金币图标",
+    "16 色上限"
+  ],
+  "avoid": [
+    "平滑渐变",
+    "抗锯齿细线",
+    "衬线体",
+    "半透明叠加"
+  ],
+  "use_for": [
+    "游戏/引擎",
+    "复古终端工具",
+    "像素美术相关",
+    "极客彩蛋页"
+  ],
+  "refs": [
+    "PICO-8 的 16 色硬限制调色板",
+    "NES PPU 调色板",
+    "8-bit 游戏 HUD"
+  ]
+}

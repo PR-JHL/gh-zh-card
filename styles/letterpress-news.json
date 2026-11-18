@@ -1,0 +1,63 @@
+{
+  "id": "letterpress-news",
+  "name": "Letterpress News",
+  "name_zh": "旧报纸铅印",
+  "family": "gen1-print",
+  "mood": [
+    "新闻纸",
+    "铅字",
+    "油墨",
+    "套红"
+  ],
+  "palette": {
+    "bg_top": "#EFEBDE",
+    "bg_bottom": "#DBD5C3",
+    "surface": "#E8E3D4",
+    "surface_alt": "#F3EFE4",
+    "text": "#1F1D19",
+    "text_dim": "#544B3D",
+    "text_faint": "#5F5547",
+    "accent": "#A02C1E",
+    "accent_2": "#22384E",
+    "accent_3": "#8A6A2F",
+    "good": "#3E6448",
+    "line": "#BAB3A0"
+  },
+  "decor": {
+    "grid": 0.05,
+    "scanlines": 0.02,
+    "corner_marks": false,
+    "frame": true,
+    "top_stripe": "accent_2",
+    "glow": 0.0,
+    "vignette": 0.14
+  },
+  "type": {
+    "title_scale": 0.95,
+    "lead": 1.37,
+    "mono_install": false
+  },
+  "motifs": [
+    "双线报头",
+    "栏间细竖线",
+    "套红小标题",
+    "网点油墨痕"
+  ],
+  "avoid": [
+    "荧光色",
+    "大圆角",
+    "渐变光",
+    "现代几何插画"
+  ],
+  "use_for": [
+    "长文/深度报道",
+    "周报月报",
+    "行业观察",
+    "考古式技术回顾"
+  ],
+  "refs": [
+    "民国《申报》铅字排版",
+    "凸版印刷网点",
+    "老式活字样张"
+  ]
+}

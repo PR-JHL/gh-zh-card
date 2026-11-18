@@ -1,0 +1,63 @@
+{
+  "id": "ukiyo-e",
+  "name": "Ukiyo-e",
+  "name_zh": "浮世绘",
+  "family": "gen1-print",
+  "mood": [
+    "和纸",
+    "普鲁士蓝",
+    "木版套色",
+    "江户"
+  ],
+  "palette": {
+    "bg_top": "#F3E9D2",
+    "bg_bottom": "#E0CFAB",
+    "surface": "#EBDCC0",
+    "surface_alt": "#F6EDDA",
+    "text": "#241F18",
+    "text_dim": "#4E4434",
+    "text_faint": "#6E6047",
+    "accent": "#1F3A5F",
+    "accent_2": "#B23A2C",
+    "accent_3": "#B98B1E",
+    "good": "#4E6B48",
+    "line": "#C0A97F"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0.02,
+    "corner_marks": false,
+    "frame": true,
+    "top_stripe": "accent",
+    "glow": 0.0,
+    "vignette": 0.1
+  },
+  "type": {
+    "title_scale": 0.98,
+    "lead": 1.36,
+    "mono_install": false
+  },
+  "motifs": [
+    "波浪鳞纹",
+    "竖向题签",
+    "朱红印章",
+    "轮廓线留白"
+  ],
+  "avoid": [
+    "荧光色",
+    "纯黑背景",
+    "现代无衬线大标题",
+    "写实摄影"
+  ],
+  "use_for": [
+    "文化/历史类项目",
+    "中文文档美化",
+    "阅读器/笔记应用",
+    "旅行与地图"
+  ],
+  "refs": [
+    "葛饰北斋《神奈川冲浪里》",
+    "歌川广重《名所江户百景》",
+    "藍摺（aizuri-e）普鲁士蓝套色"
+  ]
+}

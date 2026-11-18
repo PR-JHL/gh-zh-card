@@ -1,0 +1,63 @@
+{
+  "id": "ink-wash",
+  "name": "Ink Wash",
+  "name_zh": "水墨留白",
+  "family": "gen1-print",
+  "mood": [
+    "宣纸",
+    "焦墨",
+    "大面积留白",
+    "克制"
+  ],
+  "palette": {
+    "bg_top": "#FBF9F2",
+    "bg_bottom": "#EAE5D9",
+    "surface": "#F7F4EA",
+    "surface_alt": "#E3DDCE",
+    "text": "#1E1C19",
+    "text_dim": "#514B42",
+    "text_faint": "#736B5E",
+    "accent": "#A13A2C",
+    "accent_2": "#2C3D47",
+    "accent_3": "#4E7360",
+    "good": "#41694F",
+    "line": "#D3C7AF"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.0,
+    "vignette": 0.08
+  },
+  "type": {
+    "title_scale": 0.95,
+    "lead": 1.4,
+    "mono_install": false
+  },
+  "motifs": [
+    "一角构图",
+    "淡墨晕染边",
+    "朱文印章",
+    "竖排小字"
+  ],
+  "avoid": [
+    "高饱和色块",
+    "粗重边框",
+    "多色装饰",
+    "密集信息"
+  ],
+  "use_for": [
+    "长文/随笔",
+    "算法思想讲解",
+    "禅意产品",
+    "需要静气的说明"
+  ],
+  "refs": [
+    "马远《寒江独钓图》一角构图",
+    "牧溪《六柿图》",
+    "宣纸与朱印"
+  ]
+}

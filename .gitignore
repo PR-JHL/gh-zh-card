@@ -1,7 +1,16 @@
 # 产物
 out/
+tmp-*/
+tmp-smoke/
+tmp-speed/
 __pycache__/
 *.pyc
+
+# 每日精选的抓取产物（本地跑，不进仓库）
+daily/
+
+# 总览图的 PNG 原件（仓库里只放 JPEG，省空间）
+docs/styles-gallery.png
 
 # 本地环境
 .venv/

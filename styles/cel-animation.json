@@ -1,0 +1,63 @@
+{
+  "id": "cel-animation",
+  "name": "Cel Animation",
+  "name_zh": "赛璐璐动画",
+  "family": "gen1-print",
+  "mood": [
+    "赛璐璐片",
+    "平涂三色",
+    "水彩背景",
+    "90 年代"
+  ],
+  "palette": {
+    "bg_top": "#F7F3E7",
+    "bg_bottom": "#E3E8F0",
+    "surface": "#FBFCFE",
+    "surface_alt": "#E9EEF7",
+    "text": "#21262E",
+    "text_dim": "#4C5563",
+    "text_faint": "#6C7480",
+    "accent": "#2E6FD6",
+    "accent_2": "#EF7145",
+    "accent_3": "#5FBF8F",
+    "good": "#3D9E6B",
+    "line": "#C3CBD8"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0.02,
+    "corner_marks": false,
+    "frame": true,
+    "top_stripe": "accent",
+    "glow": 0.0,
+    "vignette": 0.08
+  },
+  "type": {
+    "title_scale": 0.98,
+    "lead": 1.36,
+    "mono_install": false
+  },
+  "motifs": [
+    "白描轮廓线",
+    "天空三色渐变",
+    "高光硬边",
+    "片头方形字幕框"
+  ],
+  "avoid": [
+    "写实阴影",
+    "杂乱纹理",
+    "灰调",
+    "过度装饰"
+  ],
+  "use_for": [
+    "图形/渲染项目",
+    "面向年轻用户的工具",
+    "教程系列",
+    "游戏相关"
+  ],
+  "refs": [
+    "90 年代赛璐璐动画背景美术",
+    "赛璐璐片+水彩背景",
+    "三色调涂法（基色/影色/高光）"
+  ]
+}

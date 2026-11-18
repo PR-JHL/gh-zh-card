@@ -1,0 +1,62 @@
+{
+  "id": "zhangjiajie-cloudsea",
+  "name": "Zhangjiajie Cloudsea",
+  "name_zh": "张家界云海",
+  "family": "landscape-photo",
+  "mood": [
+    "峰林剪影",
+    "乳白云海",
+    "日出前冷蓝",
+    "垂直纵深"
+  ],
+  "palette": {
+    "bg_top": "#1C2E3A",
+    "bg_bottom": "#2E4E62",
+    "surface": "#294659",
+    "surface_alt": "#335A70",
+    "text": "#F0F6F8",
+    "text_dim": "#A9C2CE",
+    "text_faint": "#93B0BD",
+    "accent": "#F5C877",
+    "accent_2": "#4E8C74",
+    "accent_3": "#E8F1F2",
+    "good": "#7FD3A8",
+    "line": "#3E6072"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.2,
+    "vignette": 0.12
+  },
+  "type": {
+    "title_scale": 0.98,
+    "lead": 1.36,
+    "mono_install": false
+  },
+  "motifs": [
+    "垂直的石英砂岩柱",
+    "云海翻过山脊",
+    "松树贴着崖壁",
+    "远处的层层山影"
+  ],
+  "avoid": [
+    "水墨式留白（那是纸感家族）",
+    "雾把对比压平",
+    "过饱和绿色",
+    "旅游海报感"
+  ],
+  "use_for": [
+    "复杂系统的层次比喻",
+    "架构/依赖关系封面",
+    "东方山水题材"
+  ],
+  "refs": [
+    "湖南张家界武陵源袁家界，日出前峰林剪影 + 云海翻涌",
+    "天子山视角：石英砂岩柱被冷蓝天光衬成青灰",
+    "云海在谷底积成乳白，山脊只剩剪影"
+  ]
+}

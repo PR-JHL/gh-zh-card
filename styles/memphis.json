@@ -1,0 +1,63 @@
+{
+  "id": "memphis",
+  "name": "Memphis",
+  "name_zh": "孟菲斯",
+  "family": "gen1-print",
+  "mood": [
+    "80 年代",
+    "几何顽皮",
+    "撞色",
+    "故意不平衡"
+  ],
+  "palette": {
+    "bg_top": "#FCF6EC",
+    "bg_bottom": "#EFE3D1",
+    "surface": "#FFF9EE",
+    "surface_alt": "#FBE3E9",
+    "text": "#171717",
+    "text_dim": "#4B4740",
+    "text_faint": "#6F6A62",
+    "accent": "#FF3E8F",
+    "accent_2": "#00A88F",
+    "accent_3": "#FFC300",
+    "good": "#2FA84F",
+    "line": "#171717"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": true,
+    "top_stripe": "accent",
+    "glow": 0.0,
+    "vignette": 0.0
+  },
+  "type": {
+    "title_scale": 1.0,
+    "lead": 1.35,
+    "mono_install": false
+  },
+  "motifs": [
+    "波点/条纹贴片",
+    "歪斜几何体",
+    "粗黑描边",
+    "荧光撞色"
+  ],
+  "avoid": [
+    "灰阶严肃",
+    "大量留白纪律",
+    "写实照片",
+    "极简棕灰"
+  ],
+  "use_for": [
+    "创意工具",
+    "面向 C 端的趣味功能",
+    "活动/周边",
+    "新人引导"
+  ],
+  "refs": [
+    "1981 米兰 Memphis Group 首展",
+    "Ettore Sottsass Carlton 书架",
+    "80 年代 Trapper Keeper 封面"
+  ]
+}

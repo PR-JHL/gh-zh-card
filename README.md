@@ -79,18 +79,31 @@ python gh_card.py --payload payloads/pinky.json --offline --out examples/ --styl
 python gh_card.py --payload payloads/pinky.json --offline --out examples/ --style obsidian
 ```
 
-自带两套：
+**自带 44 套风格**（28 套纸感印刷 + 16 套风光片）：
 
-| 风格 | 气质 | 适用 |
-|---|---|---|
-| `obsidian` | VS Code Obsidian 主题的紫调编辑器感，左上柔光 | 技术文章、开发者工具、代码类内容 |
-| `wandering-earth` | 冰蓝重工业 HUD，网格 + 四角定位标 + 警示红条 | 硬核/科幻项目、重大发布、数据汇报 |
+![44 套风格总览](docs/styles-gallery.jpg)
+
+| 家族 | 套数 | 色彩从哪里来 | 适合 |
+|---|---|---|---|
+| `gen1-print` 第一代 · 纸感印刷 | 28 | 油墨、纸张、矿物颜料 | 印刷物、复古、严肃文档、文化题材 |
+| `landscape-photo` 风光片 | 16 | 自然光、大气散射、水面反射 | 自然/旅行/摄影/需要"呼吸感"的封面 |
+
+```bash
+python gh_card.py --list-styles                    # 看全部 44 套
+python gh_card.py ... --style lofoten-aurora       # 罗弗敦极光（墨绿夜空 + 极光弧）
+python gh_card.py ... --style sossusvlei-dune      # 纳米布沙丘（铁锈红 + 钴蓝）
+python gh_card.py ... --style swiss-international  # 瑞士国际主义（最稳的一套）
+```
+
+风光片家族的规则是「**竖向渐变就是画面本身**」：`bg_top` 是天空上沿，`bg_bottom` 是地平线或水面。所以它们不是"换了颜色的纸"，是另一种东西。
 
 一个风格 JSON 只需要三块：`palette`（12 个颜色）、`decor`（网格/扫描线/四角标/外框/顶部色带/柔光/压暗）、`type`（标题倍率、行高、等宽开关）。
 
-**想加自己的风格**：复制一个 JSON 改颜色即可；或者用 `--style-dir <目录>` 加载外部风格库（配套的 [design-cards](../design-cards/) 里有几十套更野的风格）。
+**想加自己的风格**：复制一个 JSON 改颜色即可；或者用 `--style-dir <目录>` 加载外部风格库。
 
-设计约束只有两条，写在 `STYLE-SPEC.md` 里：**不许纯黑死卡**（深色必须有柔光或明显渐变），**不许 AI 默认审美**（配色要能指向具体的年代/文化/材质）。
+设计约束只有两条：**不许纯黑死卡**（深色必须有柔光或明显渐变，否则就是"没希望的黑"），**不许 AI 默认审美**（判据：这个配色放到任何 AI 生成的落地页上都毫无违和，那它就是废的）。
+
+重新生成总览图：`python gallery.py`
 
 ## payload 字段
 

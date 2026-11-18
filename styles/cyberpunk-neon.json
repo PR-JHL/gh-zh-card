@@ -1,0 +1,63 @@
+{
+  "id": "cyberpunk-neon",
+  "name": "Cyberpunk Neon",
+  "name_zh": "赛博朋克霓虹",
+  "family": "gen1-print",
+  "mood": [
+    "潮湿夜色",
+    "霓虹反光",
+    "高饱和撞色",
+    "电子噪音"
+  ],
+  "palette": {
+    "bg_top": "#08040F",
+    "bg_bottom": "#1B0B2E",
+    "surface": "#2A1150",
+    "surface_alt": "#38195F",
+    "text": "#F4E9FF",
+    "text_dim": "#B49AD6",
+    "text_faint": "#8E76B0",
+    "accent": "#FF2E97",
+    "accent_2": "#00E5FF",
+    "accent_3": "#FFE14D",
+    "good": "#4BFFB3",
+    "line": "#3A1E5C"
+  },
+  "decor": {
+    "grid": 0.12,
+    "scanlines": 0.07,
+    "corner_marks": true,
+    "frame": true,
+    "top_stripe": "accent",
+    "glow": 0.22,
+    "vignette": 0.28
+  },
+  "type": {
+    "title_scale": 1.0,
+    "lead": 1.36,
+    "mono_install": true
+  },
+  "motifs": [
+    "招牌霓虹管描边",
+    "湿地面反光条",
+    "日文片假名噪点",
+    "品红/青双色分离"
+  ],
+  "avoid": [
+    "纯黑死底",
+    "柔和粉彩",
+    "米色纸质",
+    "对称稳妥的排版"
+  ],
+  "use_for": [
+    "游戏/引擎项目",
+    "夜生活/音乐产品",
+    "Web3 与加密话题",
+    "黑客松视觉"
+  ],
+  "refs": [
+    "《银翼杀手 2049》拉斯维加斯霓虹",
+    "《攻壳机动队》新港市街景",
+    "东京歌舞伎町招牌群"
+  ]
+}

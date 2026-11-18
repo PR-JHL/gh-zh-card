@@ -1,0 +1,63 @@
+{
+  "id": "dark-academia",
+  "name": "Dark Academia",
+  "name_zh": "暗黑学术",
+  "family": "gen1-print",
+  "mood": [
+    "旧书",
+    "墨绿",
+    "烛光",
+    "学者的偏执"
+  ],
+  "palette": {
+    "bg_top": "#12100C",
+    "bg_bottom": "#211C15",
+    "surface": "#30281D",
+    "surface_alt": "#3C3225",
+    "text": "#E9DFC9",
+    "text_dim": "#B8A98B",
+    "text_faint": "#96876B",
+    "accent": "#C6A75E",
+    "accent_2": "#7A3A3A",
+    "accent_3": "#4E6B57",
+    "good": "#7F9A6A",
+    "line": "#3C3325"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": true,
+    "top_stripe": "accent_2",
+    "glow": 0.14,
+    "vignette": 0.3
+  },
+  "type": {
+    "title_scale": 0.95,
+    "lead": 1.38,
+    "mono_install": false
+  },
+  "motifs": [
+    "烫金字标题",
+    "皮质书脊分隔线",
+    "深绿黑板",
+    "羊皮纸角标"
+  ],
+  "avoid": [
+    "荧光色",
+    "大圆角",
+    "emoji",
+    "彩色插画"
+  ],
+  "use_for": [
+    "源码阅读笔记",
+    "编译原理/论文解读",
+    "历史技术考据",
+    "写给同行的深水区内容"
+  ],
+  "refs": [
+    "牛津 Bodleian 图书馆",
+    "羊皮纸手稿",
+    "深绿黑板与粉笔"
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "id": "qinghai-emerald",
+  "name": "Qinghai Emerald",
+  "name_zh": "青海翡翠湖",
+  "family": "landscape-photo",
+  "mood": [
+    "蓝调时刻",
+    "翡翠卤水",
+    "盐白结晶",
+    "赭红湖岸"
+  ],
+  "palette": {
+    "bg_top": "#07262E",
+    "bg_bottom": "#0E4A46",
+    "surface": "#0C3C3C",
+    "surface_alt": "#115450",
+    "text": "#EAFBF5",
+    "text_dim": "#95D8C6",
+    "text_faint": "#6FAF9F",
+    "accent": "#2BE3B4",
+    "accent_2": "#E07A4E",
+    "accent_3": "#D8F5EA",
+    "good": "#4BE08C",
+    "line": "#144F4C"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.22,
+    "vignette": 0.1
+  },
+  "type": {
+    "title_scale": 1.0,
+    "lead": 1.34,
+    "mono_install": false
+  },
+  "motifs": [
+    "卤水池的不规则边界",
+    "盐结晶的白边",
+    "远处赭红线",
+    "无风时的镜面"
+  ],
+  "avoid": [
+    "荧光绿到刺眼",
+    "灰绿浑浊",
+    "死黑水面",
+    "AI 感山水"
+  ],
+  "use_for": [
+    "数据/存储类比喻（池化）",
+    "环保与地理内容",
+    "需要清凉感的封面"
+  ],
+  "refs": [
+    "青海大柴旦翡翠湖，日落后 10 分钟蓝调时刻",
+    "盐白结晶滩 + 翡翠色卤水 + 赭红湖岸土",
+    "高原无风时卤水镜面，天际线压得很低"
+  ]
+}

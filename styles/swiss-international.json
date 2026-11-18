@@ -1,0 +1,63 @@
+{
+  "id": "swiss-international",
+  "name": "Swiss International",
+  "name_zh": "瑞士国际主义",
+  "family": "gen1-print",
+  "mood": [
+    "网格秩序",
+    "留白",
+    "绝对理性",
+    "克制的红"
+  ],
+  "palette": {
+    "bg_top": "#FFFFFF",
+    "bg_bottom": "#EFEFEC",
+    "surface": "#FFFFFF",
+    "surface_alt": "#E7E7E1",
+    "text": "#111111",
+    "text_dim": "#55554F",
+    "text_faint": "#7B7B73",
+    "accent": "#D92121",
+    "accent_2": "#1C3F94",
+    "accent_3": "#8A8A80",
+    "good": "#0F7A4D",
+    "line": "#CFCFC8"
+  },
+  "decor": {
+    "grid": 0.03,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "accent",
+    "glow": 0.0,
+    "vignette": 0.0
+  },
+  "type": {
+    "title_scale": 0.94,
+    "lead": 1.32,
+    "mono_install": false
+  },
+  "motifs": [
+    "严格 12 栏网格",
+    "左对齐齐头",
+    "红色细横线",
+    "大号数字序标"
+  ],
+  "avoid": [
+    "装饰图形",
+    "彩色渐变",
+    "手写体",
+    "居中对称"
+  ],
+  "use_for": [
+    "严肃技术文档",
+    "数据与研究结论",
+    "架构说明",
+    "年度总结"
+  ],
+  "refs": [
+    "Josef Müller-Brockmann《Musica Viva》海报",
+    "Helvetica（2007 纪录片）",
+    "苏黎世 SBB 导视系统"
+  ]
+}

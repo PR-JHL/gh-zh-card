@@ -1,0 +1,63 @@
+{
+  "id": "persian-miniature",
+  "name": "Persian Miniature",
+  "name_zh": "波斯细密画",
+  "family": "gen1-print",
+  "mood": [
+    "青金石",
+    "金箔",
+    "胭脂红",
+    "花园"
+  ],
+  "palette": {
+    "bg_top": "#F5EBD7",
+    "bg_bottom": "#E3D2B0",
+    "surface": "#EDE0C4",
+    "surface_alt": "#F8F1E1",
+    "text": "#231A12",
+    "text_dim": "#51402A",
+    "text_faint": "#6E5B3D",
+    "accent": "#2A4A8C",
+    "accent_2": "#A63A4E",
+    "accent_3": "#C0981F",
+    "good": "#3F6B4A",
+    "line": "#BCA47A"
+  },
+  "decor": {
+    "grid": 0.03,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": true,
+    "top_stripe": "accent_3",
+    "glow": 0.0,
+    "vignette": 0.12
+  },
+  "type": {
+    "title_scale": 0.95,
+    "lead": 1.37,
+    "mono_install": false
+  },
+  "motifs": [
+    "细密蔓藤边框",
+    "金箔点缀",
+    "拱形开窗",
+    "密排小花"
+  ],
+  "avoid": [
+    "纯黑",
+    "荧光色",
+    "现代几何",
+    "空荡留白"
+  ],
+  "use_for": [
+    "国际化产品",
+    "文档站",
+    "多语言项目",
+    "精致的说明页"
+  ],
+  "refs": [
+    "大不里士画派《列王纪》细密画",
+    "青金石蓝与金箔",
+    "波斯地毯纹样"
+  ]
+}

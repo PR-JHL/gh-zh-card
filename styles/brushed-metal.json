@@ -1,0 +1,63 @@
+{
+  "id": "brushed-metal",
+  "name": "Brushed Metal",
+  "name_zh": "拉丝金属工业",
+  "family": "gen1-print",
+  "mood": [
+    "阳极氧化",
+    "拉丝纹",
+    "仪器面板",
+    "冷静克制"
+  ],
+  "palette": {
+    "bg_top": "#DBDFE3",
+    "bg_bottom": "#ABB1B7",
+    "surface": "#C6CBCF",
+    "surface_alt": "#DCE0E3",
+    "text": "#1A1D1F",
+    "text_dim": "#454B4F",
+    "text_faint": "#44494D",
+    "accent": "#2E6B8A",
+    "accent_2": "#D99A00",
+    "accent_3": "#B23A2E",
+    "good": "#2F7D52",
+    "line": "#8F979C"
+  },
+  "decor": {
+    "grid": 0.02,
+    "scanlines": 0.05,
+    "corner_marks": true,
+    "frame": true,
+    "top_stripe": "accent_2",
+    "glow": 0.12,
+    "vignette": 0.12
+  },
+  "type": {
+    "title_scale": 0.95,
+    "lead": 1.33,
+    "mono_install": true
+  },
+  "motifs": [
+    "水平拉丝纹理",
+    "蚀刻铭牌",
+    "螺丝孔位",
+    "警示黄标条"
+  ],
+  "avoid": [
+    "彩色渐变",
+    "卡通图形",
+    "圆润胶囊按钮",
+    "纸质纹理"
+  ],
+  "use_for": [
+    "基础设施/运维",
+    "监控面板",
+    "硬件评测",
+    "企业内工具"
+  ],
+  "refs": [
+    "Braun/Dieter Rams 拉丝铝面板",
+    "仪器前面板阳极氧化",
+    "ALPS 金属旋钮铭牌"
+  ]
+}

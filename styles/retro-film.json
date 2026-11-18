@@ -1,0 +1,63 @@
+{
+  "id": "retro-film",
+  "name": "Retro Film",
+  "name_zh": "复古胶片",
+  "family": "gen1-print",
+  "mood": [
+    "暖调",
+    "胶片颗粒",
+    "褪色",
+    "70 年代"
+  ],
+  "palette": {
+    "bg_top": "#F4E9D6",
+    "bg_bottom": "#E1CFB1",
+    "surface": "#EBDCC4",
+    "surface_alt": "#F6EEDE",
+    "text": "#221B13",
+    "text_dim": "#544734",
+    "text_faint": "#73644C",
+    "accent": "#C8632B",
+    "accent_2": "#2F4A4E",
+    "accent_3": "#D9A03C",
+    "good": "#5A7A46",
+    "line": "#C4AF8B"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0.02,
+    "corner_marks": false,
+    "frame": true,
+    "top_stripe": "accent_3",
+    "glow": 0.08,
+    "vignette": 0.26
+  },
+  "type": {
+    "title_scale": 0.98,
+    "lead": 1.38,
+    "mono_install": false
+  },
+  "motifs": [
+    "柔和暗角",
+    "褪色橙与青影",
+    "边角片号",
+    "胶片齿孔边"
+  ],
+  "avoid": [
+    "纯白",
+    "饱和霓虹",
+    "硬边矢量",
+    "冷蓝主调"
+  ],
+  "use_for": [
+    "个人项目",
+    "回顾类内容",
+    "摄影/影像工具",
+    "非技术读者"
+  ],
+  "refs": [
+    "Kodak Portra 400",
+    "70 年代富士彩色负片",
+    "暗房放大样片"
+  ]
+}

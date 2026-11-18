@@ -2,6 +2,7 @@
   "id": "wandering-earth",
   "name": "Wandering Earth",
   "name_zh": "流浪地球",
+  "family": "gen1-print",
   "mood": ["重工业", "冰蓝", "宏大", "警示", "冷"],
   "palette": {
     "bg_top": "#0A1622",

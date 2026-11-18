@@ -1,0 +1,62 @@
+{
+  "id": "autumn-aspen",
+  "name": "Autumn Aspen",
+  "name_zh": "秋季白杨",
+  "family": "landscape-photo",
+  "mood": [
+    "九月底正午",
+    "金黄叶片",
+    "湛蓝天空",
+    "干净的高饱和"
+  ],
+  "palette": {
+    "bg_top": "#A7C6DE",
+    "bg_bottom": "#F2E4BC",
+    "surface": "#FAF3DD",
+    "surface_alt": "#E8DCB8",
+    "text": "#1E2418",
+    "text_dim": "#4A4A32",
+    "text_faint": "#6B6A48",
+    "accent": "#C4501C",
+    "accent_2": "#2F6B3F",
+    "accent_3": "#E8A93C",
+    "good": "#2E7D4F",
+    "line": "#D8CFAE"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.02,
+    "vignette": 0.04
+  },
+  "type": {
+    "title_scale": 1.0,
+    "lead": 1.38,
+    "mono_install": false
+  },
+  "motifs": [
+    "白杨树干的白色横纹",
+    "金黄树冠的透光",
+    "落叶铺地的一条路",
+    "蓝色远山"
+  ],
+  "avoid": [
+    "课本体裁的秋天插图",
+    "橙黄整体滤镜",
+    "低对比发灰",
+    "俗套枫叶图"
+  ],
+  "use_for": [
+    "个人项目与作品集",
+    "季节性发布",
+    "需要暖意的技术内容"
+  ],
+  "refs": [
+    "美国科罗拉多 San Juan 山脉，9 月底正午，白杨（aspen）林",
+    "金黄叶片与湛蓝天空的高饱和互补对比",
+    "白杨树干的白色横纹是识别点"
+  ]
+}

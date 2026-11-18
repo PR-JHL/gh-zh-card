@@ -1,0 +1,62 @@
+{
+  "id": "glacier-cave",
+  "name": "Glacier Cave",
+  "name_zh": "冰川冰洞",
+  "family": "landscape-photo",
+  "mood": [
+    "冰蓝",
+    "洞内散射光",
+    "密度极高的蓝",
+    "静"
+  ],
+  "palette": {
+    "bg_top": "#0B2B3E",
+    "bg_bottom": "#12475C",
+    "surface": "#0F3D50",
+    "surface_alt": "#17576E",
+    "text": "#EAF8FC",
+    "text_dim": "#A3CFDD",
+    "text_faint": "#7FA9B8",
+    "accent": "#6FDCEC",
+    "accent_2": "#F5C96B",
+    "accent_3": "#D8F2F8",
+    "good": "#74D8D0",
+    "line": "#1C5A70"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.2,
+    "vignette": 0.08
+  },
+  "type": {
+    "title_scale": 1.0,
+    "lead": 1.38,
+    "mono_install": false
+  },
+  "motifs": [
+    "冰层里的气泡层理",
+    "洞口斜射的一束暖光",
+    "冰壁的蓝白过渡",
+    "洞顶低垂的冰檐"
+  ],
+  "avoid": [
+    "死黑洞壁",
+    "紫色冰",
+    "高饱和青绿",
+    "人工灯光感"
+  ],
+  "use_for": [
+    "冷色调技术内容",
+    "存储/压缩类比喻",
+    "冬季与极地主题"
+  ],
+  "refs": [
+    "冰岛瓦特纳冰川 Vatnajökull 蓝冰洞，阴天正午洞内散射光",
+    "Breiðamerkurjökull 出口冰川的冰洞与洞口暖光",
+    "冰越厚越蓝：冰体吸收长波、透出短波蓝"
+  ]
+}

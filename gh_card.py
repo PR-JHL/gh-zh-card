@@ -273,14 +273,17 @@ def fetch_repo(slug: str) -> dict:
 
 # ---------------------------------------------------------------- 渲染
 def vertical_gradient(w: int, h: int, top, bot) -> Image.Image:
-    img = Image.new("RGB", (w, h), top)
-    px = img.load()
+    """竖向渐变：只算一列 h 个像素，再横向拉伸到 w。
+
+    早期版本逐像素写 w*h 个点（1080x1440 = 155 万次赋值），单张图要好几秒，
+    而渐变本身横向是恒定的，所以拉伸结果完全等价、快两个数量级。
+    """
+    base = Image.new("RGB", (1, h))
+    px = base.load()
     for y in range(h):
         t = y / max(1, h - 1)
-        col = tuple(int(top[i] + (bot[i] - top[i]) * t) for i in range(3))
-        for x in range(w):
-            px[x, y] = col
-    return img
+        px[0, y] = tuple(int(top[i] + (bot[i] - top[i]) * t) for i in range(3))
+    return base.resize((w, h), Image.NEAREST)
 
 
 def pill(draw, x: int, y: int, text: str, font, fg, bg, padx=18, pady=9) -> int:
@@ -662,7 +665,32 @@ def main() -> None:
                     help="额外风格目录，可重复；用来加载 design-cards 里的风格库")
     ap.add_argument("--no-credit", action="store_true",
                     help="不画底部署名（默认画：卡片被转发时带上项目链接）")
+    ap.add_argument("--list-styles", action="store_true",
+                    help="列出 styles/ 里所有可用风格，然后退出")
     args = ap.parse_args()
+
+    if args.list_styles:
+        rows_seen: list[tuple[str, str, str]] = []
+        known: set[str] = set()
+        for base in [Path(p) for p in args.style_dir] + STYLE_DIRS:
+            if not Path(base).is_dir():
+                continue
+            for f in sorted(Path(base).glob("*.json")):
+                if f.stem in known:
+                    continue
+                try:
+                    st = json.loads(f.read_text(encoding="utf-8"))
+                except (OSError, ValueError):
+                    continue
+                known.add(f.stem)
+                rows_seen.append((f.stem,
+                                  st.get("name_zh") or st.get("name") or "",
+                                  st.get("family") or ""))
+        print(f"{'id':24}{'中文名':16}{'家族'}")
+        for sid, nm, fam in rows_seen:
+            print(f"{sid:24}{nm:16}{fam}")
+        print(f"\n共 {len(rows_seen)} 套。用法：--style <id>")
+        return
 
     payload: dict = {}
     if args.payload:

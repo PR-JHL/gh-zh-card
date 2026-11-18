@@ -1,0 +1,62 @@
+{
+  "id": "iceland-highland",
+  "name": "Iceland Highland",
+  "name_zh": "冰岛高地",
+  "family": "landscape-photo",
+  "mood": [
+    "八月薄云",
+    "苔藓绿",
+    "流纹岩赭黄",
+    "硫磺黄"
+  ],
+  "palette": {
+    "bg_top": "#C6D6E0",
+    "bg_bottom": "#A0B074",
+    "surface": "#BCC79A",
+    "surface_alt": "#93A66A",
+    "text": "#141A12",
+    "text_dim": "#3C4430",
+    "text_faint": "#454D31",
+    "accent": "#E3C42F",
+    "accent_2": "#2B2B27",
+    "accent_3": "#7FA85C",
+    "good": "#2F7A4A",
+    "line": "#A9B58A"
+  },
+  "decor": {
+    "grid": 0,
+    "scanlines": 0,
+    "corner_marks": false,
+    "frame": false,
+    "top_stripe": "none",
+    "glow": 0.0,
+    "vignette": 0.04
+  },
+  "type": {
+    "title_scale": 0.98,
+    "lead": 1.38,
+    "mono_install": false
+  },
+  "motifs": [
+    "苔藓包裹的熔岩原",
+    "流纹岩的赭黄条纹",
+    "地热喷气孔的蒸汽",
+    "无树的空旷地平线"
+  ],
+  "avoid": [
+    "草绿到刺眼",
+    "灰绿浑浊",
+    "冰岛情调滤镜",
+    "雪山刻板印象"
+  ],
+  "use_for": [
+    "地热/能源类内容",
+    "开拓性与长期主义叙事",
+    "自然与地理主题"
+  ],
+  "refs": [
+    "冰岛高地 Landmannalaugar，8 月薄云正午",
+    "流纹岩山体的赭黄、苔藓绿包裹的熔岩原、喷气孔附近的鲜黄硫磺",
+    "高地无树，地平线极长，云层压得很低"
+  ]
+}
