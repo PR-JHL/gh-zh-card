@@ -9,8 +9,15 @@ __pycache__/
 # 每日精选的抓取产物（本地跑，不进仓库）
 daily/
 
+# 卡牌合集（本地展示用，图片太重；等想清楚要不要公开再说）
+collection/
+
 # 总览图的 PNG 原件（仓库里只放 JPEG，省空间）
 docs/styles-gallery.png
+
+# 自检产物
+*.check.png
+selftest-report.json
 
 # 本地环境
 .venv/

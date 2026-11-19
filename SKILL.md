@@ -22,6 +22,8 @@ python gh_card.py --fetch owner/repo --payload p.json --out out/
 ```
 
 - `--fetch` 直接从 GitHub API 取 `stars / forks / language / license / pushed_at`
+- `--fetch` 会用真数据**覆盖 payload 里的旧统计**（文案字段不动），加 `--save` 再把数字和
+  抓取时间写回 payload —— 之后 `copy_check.py` 才能离线复核这些数字
 - **数字只能来自 API，或用户提供的已核实数据。** 禁止凭印象填
 - 网络不通（代理重置等）时用 `--offline`，把核实过的数字写进 payload
 - API 限流 60 次/小时（未带 token）：设 `GITHUB_TOKEN` 环境变量可到 5000 次/小时
@@ -49,6 +51,18 @@ python gh_card.py --fetch owner/repo --payload p.json --out out/
 
 字段全部可选，缺了就不渲染那一块。但 `owner/repo/name_zh/tagline` 缺了卡就是残的。
 
+**写完先体检，别急着渲染：**
+
+```bash
+python copy_check.py p.json            # 文案 vs payload：数字 / 长度 / 夸大词 / 结构
+python copy_check.py p.json --online   # 顺便打 API 抓实时数据核对（星数容易过期）
+```
+
+它只判断机械能判的部分：文案里的星数、推送天数、许可证跟 payload 对不对得上；tagline 有没有
+真的翻成中文；痛点是不是写成了功能清单；长度会不会把卡片挤到缩字号/截断。
+
+**「有没有说到点上」它管不了** —— 那要读 README，还是你的事。
+
 ### 4. 渲染
 
 ```bash
@@ -74,13 +88,27 @@ python gh_card.py --payload p.json --offline --out out/ --name 01-slug --md --ca
 
 ### 5. 自检（必做）
 
-**把生成的 PNG 打开看一遍。** 要检查：
+先跑脚本自检，再亲眼看一遍图。
 
-- 有没有把英文单词拆成 `A / ndroid` 这种断行（脚本已处理，但极其长的词仍可能）
-- 页脚四个数据项有没有互相贴住
-- 有没有豆腐块（□）——说明字体缺字形
-- 底部「结论」区块有没有压到数据条
-- **深色卡是不是"死黑"**：如果整张图除了文字几乎没有明暗层次，说明这个风格的 `glow` / `bg_top≠bg_bottom` 没配好，换风格或调 JSON
+```bash
+python gh_card.py --payload p.json --offline --out out/ --check
+```
+
+`--check` 把原来只能肉眼扫的问题变成断言：文字出界、压到页脚数据条、两块文字互相压住、
+单行超宽、豆腐块（字体缺字形）、对比度不足、内容被省略或截断。有 error 时退出码 1。
+
+**内容太长时脚本会自动降级**（整体缩字号 → 省掉命令块/适合谁 → 省第 3 条痛点），
+每一步都会在 `--check` 里报出来。看到 `COPY_DROPPED` / `COPY_TRUNCATED` 就**改文案**，
+不要改排版参数硬塞。
+
+**「文案的问题」用 `copy_check.py` 管（渲染前），「版面的问题」用 `--check` 管（渲染后）。**
+
+**然后看图，只检查机器判不了的东西：**
+
+- 文案读起来是不是人话、有没有硬吹（见下面的「文案质量标准」）
+- 这套风格配不配这个项目
+- 页脚四个数据项有没有互相贴住（自检也会提醒）
+- **深色卡是不是"发闷"**：整张图除了文字几乎没有明暗过渡，说明 `glow` / 渐变没配好，换风格或调 JSON
 
 发现问题就缩短文案，不要改排版参数硬塞。
 

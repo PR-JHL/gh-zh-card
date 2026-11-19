@@ -11,9 +11,12 @@ MIT License.
 
 两种用法：
   A) agent 模式（推荐）：agent 写一份 payload.json，脚本只渲染
-       python gh_card.py --payload payload.json
+       python gh_card.py --payload payload.json --check
   B) 手动模式：自动抓数据，不带中文摘要，仅出"数据卡"
        python gh_card.py --fetch owner/repo --out examples/
+
+渲染是「先排版、再落笔」：内容塞不下时先整体缩字号，再省次要区块，最后才截断并报告，
+不会静默压到页脚数据条上。--check 会把版面/文案长度/可读性问题变成断言（见 card_check.py）。
 """
 from __future__ import annotations
 
@@ -38,6 +41,16 @@ except ImportError:  # pragma: no cover
 # ---------------------------------------------------------------- 主题
 W, H = 1080, 1440
 PAD = 76
+
+# 竖向分区：正文只能待在这条线以上，页脚数据条以下归页脚
+FOOT_LINE = H - PAD - 96 - 34       # 页脚分隔线
+CONTENT_BOTTOM = FOOT_LINE - 24     # 正文最低边界
+VERDICT_MIN_H = 96                  # 结论块最小高度（两行）
+VERDICT_BOTTOM_LIMIT = FOOT_LINE - 6  # 结论块底边不许越过的线（页脚线留 6px）
+FIT_SCALES = (1.0, 0.94, 0.88, 0.82, 0.76, 0.70)
+FIT_SKIPS = ((), ("start",), ("start", "for_who"),
+             ("start", "for_who", "pain3"), ("start", "for_who", "pain3", "pain2"),
+             ("start", "for_who", "pain3", "pain2", "pain"))
 
 # ---------------------------------------------------------------- 默认风格
 # 真正的风格在 styles/<id>.json 里；这里只是兜底，保证没有 style 文件也能出图。
@@ -140,12 +153,30 @@ def _tokens(s: str) -> list[str]:
 
 
 def wrap_cjk(draw, s: str, font, max_w: int) -> list[str]:
-    """按「英文整词 + 中文逐字 + 标点禁则」换行，避免把 Android 拆成 A/ndroid。"""
+    """按「英文整词 + 中文逐字 + 标点禁则」换行，避免把 Android 拆成 A/ndroid。
+
+    单个词比整行还宽时（长 URL、长包名）按字符硬断 —— 否则它会直接冲出卡片右边界。
+    """
     lines: list[str] = []
     for para in s.split("\n"):
         cur = ""
         for tok in _tokens(para):
-            if text_w(draw, cur + tok, font) <= max_w or not cur:
+            if text_w(draw, tok, font) > max_w:
+                # 这一个词自己就放不下一行：先把当前行收掉，再把这个词逐字硬断
+                if cur:
+                    lines.append(cur)
+                    cur = ""
+                rest = tok
+                while rest:
+                    take = ""
+                    for ch in rest:
+                        if take and text_w(draw, take + ch, font) > max_w:
+                            break
+                        take += ch
+                    lines.append(take)
+                    rest = rest[len(take):]
+                continue
+            if not cur or text_w(draw, cur + tok, font) <= max_w:
                 cur += tok
                 continue
             # 标点不出现在行首：宁可行尾稍微超一点
@@ -162,12 +193,26 @@ def wrap_cjk(draw, s: str, font, max_w: int) -> list[str]:
     return [ln for ln in lines] or [""]
 
 
-def fit_single(draw, s: str, kind: str, max_w: int, start: int, min_size: int = 18):
-    """单行文本自动缩字号直到塞得下。"""
+def fit_value(draw, s: str, kind: str, max_w: int, start: int = 40,
+              min_size: int = 20) -> tuple[str, ImageFont.FreeTypeFont]:
+    """页脚数值：先缩字号；缩到底还放不下就截断加省略号。
+
+    宁可字短一点，也不能让「Mozilla Public License 2.0」压到隔壁的「今天」上。
+    """
+    font = load_font(kind, start)
     size = start
-    while size > min_size and text_w(draw, s, load_font(kind, size)) > max_w:
+    while size > min_size and text_w(draw, s, font) > max_w:
         size -= 1
-    return load_font(kind, size), size
+        font = load_font(kind, size)
+    if text_w(draw, s, font) <= max_w:
+        return s, font
+    font = load_font(kind, min_size)
+    if text_w(draw, s, font) <= max_w:
+        return s, font
+    cut = s
+    while cut and text_w(draw, cut + "…", font) > max_w:
+        cut = cut[:-1]
+    return ((cut.rstrip() + "…") if cut else "…"), font
 
 
 def fit_block(draw, s: str, kind: str, max_w: int, max_lines: int,
@@ -192,12 +237,18 @@ def has_cjk(s: str) -> bool:
 
 
 def fmt_num(n) -> str:
+    """1234 -> 1.2k，123456 -> 123k，1234567 -> 1.2M。
+
+    以前只做 k，六位数会被写成 1234.6k（数位读起来是错的）。
+    """
     try:
         n = int(n)
     except (TypeError, ValueError):
         return str(n)
-    if n >= 10000:
-        return f"{n / 1000:.1f}k"
+    if n >= 1_000_000:
+        return f"{n / 1_000_000:.1f}M"
+    if n >= 100_000:
+        return f"{n / 1000:.0f}k"
     if n >= 1000:
         return f"{n / 1000:.1f}k"
     return str(n)
@@ -268,6 +319,8 @@ def fetch_repo(slug: str) -> dict:
         "topics": (d.get("topics") or [])[:4],
         "description": d.get("description") or "",
         "url": d.get("html_url"),
+        # 记下这批数字是什么时候抓的：卡片发出去之后还能回答「当时是多少」
+        "stats_fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
     }
 
 
@@ -284,14 +337,6 @@ def vertical_gradient(w: int, h: int, top, bot) -> Image.Image:
         t = y / max(1, h - 1)
         px[0, y] = tuple(int(top[i] + (bot[i] - top[i]) * t) for i in range(3))
     return base.resize((w, h), Image.NEAREST)
-
-
-def pill(draw, x: int, y: int, text: str, font, fg, bg, padx=18, pady=9) -> int:
-    w = text_w(draw, text, font) + padx * 2
-    h = font.size + pady * 2
-    draw.rounded_rectangle([x, y, x + w, y + h], radius=h // 2, fill=bg)
-    draw.text((x + padx, y + pady - 2), text, font=font, fill=fg)
-    return x + w
 
 
 def _rel_luminance(c) -> float:
@@ -427,141 +472,360 @@ def draw_decor_over(draw, style: dict) -> None:
             draw.line([(bx, by), (bx, by + sy * seg)], fill=ac, width=3)
 
 
-def render(payload: dict, out_path: Path, style: dict | None = None) -> Path:
-    style = style or DEFAULT_STYLE
-    pal = style["palette"]
-    typ = style.get("type") or {}
-    title_scale = float(typ.get("title_scale") or 1.0)
-    lead_mul = float(typ.get("lead") or 1.34)
+# ---------------------------------------------------------------- 布局审计
+# 卡片是「先算后画」：把要画的东西排成 ops、量出总高度，塞不下就整体缩字号或
+# 省略次要区块，最后才落笔。以前是边走边画，内容一长就静默压到页脚数据条上。
 
-    # 局部遮蔽模块级默认色：渲染体里就不必到处传 theme
+SKIP_LABELS = {
+    "start": "「怎么开始」区块",
+    "for_who": "「适合谁」区块",
+    "pain3": "第 3 条痛点",
+    "pain2": "第 2 条痛点",
+    "pain": "「它能解决什么」整块",
+}
+
+
+class Audit:
+    """记录一次渲染的几何与色彩事实，交给 card_check.py 断言。
+
+    render() 里每画一块文字都会在这里留一条记录：落在哪、什么颜色、
+    底下的背景是什么颜色。有了它，「有没有压到页脚」「对比度够不够」
+    这类原来只能靠肉眼的问题，就能被程序判定。
+    """
+
+    def __init__(self) -> None:
+        self.texts: list[dict] = []
+        self.rects: list[dict] = []
+        self.frames: dict = {}
+        self.bg_stats: dict = {}
+        self.scale: float = 1.0
+        self.dropped: list[str] = []
+        self.truncated: list[dict] = []
+
+    def add_text(self, d, img, section, xy, text, font, fill, max_w=None, bg=None) -> None:
+        box = d.textbbox(xy, text, font=font)
+        if bg is None:
+            cx = min(max((box[0] + box[2]) // 2, 0), W - 1)
+            cy = min(max((box[1] + box[3]) // 2, 0), H - 1)
+            bg = img.getpixel((cx, cy))
+        self.texts.append({
+            "section": section,
+            "text": text,
+            "bbox": [int(v) for v in box],
+            "color": [int(v) for v in fill],
+            "bg": [int(v) for v in bg],
+            "font_path": getattr(font, "path", "") or "",
+            "size": int(getattr(font, "size", 0) or 0),
+            "max_w": max_w,
+            "_font": font,
+        })
+
+    def to_json(self) -> dict:
+        return {
+            "scale": self.scale,
+            "dropped": self.dropped,
+            "truncated": self.truncated,
+            "frames": {k: list(v) if isinstance(v, tuple) else v
+                       for k, v in self.frames.items()},
+            "bg_stats": self.bg_stats,
+            "texts": [{k: v for k, v in t.items() if not k.startswith("_")}
+                      for t in self.texts],
+            "rects": self.rects,
+        }
+
+
+# ---------------------------------------------------------------- 调色板
+def _palette(style: dict) -> dict:
+    """把 styles/<id>.json 解析成一组 RGB；顺带处理 accent 当正文色的可读性兜底。"""
+    pal = style["palette"]
     BG_TOP, BG_BOT = rgb(pal["bg_top"]), rgb(pal["bg_bottom"])
     CARD, CARD_HI = rgb(pal["surface"]), rgb(pal["surface_alt"])
     TEXT, DIM, FAINT = rgb(pal["text"]), rgb(pal["text_dim"]), rgb(pal["text_faint"])
     ACCENT, ACCENT2 = rgb(pal["accent"]), rgb(pal["accent_2"])
     GREEN, LINE = rgb(pal["good"]), rgb(pal["line"])
-
     # accent 用作正文色时可能糊在背景里（浅色主题的荧光黄、粉色尤其明显）。
     # 对比不够就退回正文色，装饰块仍然用原 accent —— 保留风格，但保证读得清。
     ACCENT_TEXT = ACCENT if contrast_ratio(ACCENT, BG_BOT) >= 4.0 else TEXT
     ACCENT2_TEXT = ACCENT2 if contrast_ratio(ACCENT2, CARD_HI) >= 3.0 else TEXT
+    # 命令块的首行用 good 色（绿色）当「可执行」的记号；浅色卡上它会糊成一片，
+    # 所以同样要兜底成正文色。
+    GOOD_TEXT = GREEN if contrast_ratio(GREEN, CARD_HI) >= 3.0 else TEXT
+    return {
+        "bg_top": BG_TOP, "bg_bot": BG_BOT, "card": CARD, "card_hi": CARD_HI,
+        "text": TEXT, "dim": DIM, "faint": FAINT,
+        "accent": ACCENT, "accent_2": ACCENT2, "good": GREEN, "line": LINE,
+        "accent_text": ACCENT_TEXT, "accent2_text": ACCENT2_TEXT,
+        "good_text": GOOD_TEXT,
+    }
 
-    img = build_background(style)
-    d = ImageDraw.Draw(img)
+
+def _bg_stats(img: Image.Image) -> dict:
+    """背景的明暗层次：用来判「死黑卡」（除文字外几乎没有明暗过渡）。"""
+    hist = img.convert("L").histogram()
+    total = sum(hist) or 1
+    mean = sum(i * c for i, c in enumerate(hist)) / total
+
+    def pct(p: float) -> int:
+        acc, target = 0, total * p / 100.0
+        for i, c in enumerate(hist):
+            acc += c
+            if acc >= target:
+                return i
+        return 255
+
+    return {"mean": round(mean, 1), "p5": pct(5), "p95": pct(95),
+            "levels": sum(1 for c in hist if c)}
+
+
+# ---------------------------------------------------------------- 排版（只测量）
+def plan_content(d, payload: dict, style: dict, scale: float = 1.0,
+                 skip: tuple = ()) -> tuple[list[dict], int]:
+    """算出页脚之上所有绘制指令；返回 (ops, 内容最底 y)。只测量，不落笔。"""
+    C = _palette(style)
+    typ = style.get("type") or {}
+    title_scale = float(typ.get("title_scale") or 1.0)
+    lead_mul = float(typ.get("lead") or 1.34)
+
+    S = lambda v: int(round(v * scale))
+    F = lambda kind, size: load_font(kind, max(11, S(size)))
+    ops: list[dict] = []
+
+    def text(section, tx, ty, s, font, fill, max_w=None, bg=None):
+        ops.append({"kind": "text", "section": section, "xy": (int(tx), int(ty)),
+                    "text": s, "font": font, "fill": fill, "max_w": max_w, "bg": bg})
+
+    def rect(section, box, radius, fill):
+        ops.append({"kind": "rect", "section": section,
+                    "box": tuple(int(v) for v in box), "radius": radius, "fill": fill})
+
+    def note(field, dropped: str):
+        ops.append({"kind": "note", "field": field, "dropped": dropped})
 
     x = PAD
     y = 66
-    f_pill = load_font("cn", 24)
-    x_end = pill(d, x, y, "GitHub 中文速览", f_pill, ACCENT_TEXT, CARD_HI)
-    y += 58
+
+    # 顶部标签 pill（保持原样：文字 + 胶囊底）
+    f_pill = F("cn", 24)
+    label = "GitHub 中文速览"
+    pw = text_w(d, label, f_pill) + 36
+    ph = f_pill.size + 18
+    rect("pill", (x, y, x + pw, y + ph), ph // 2, C["card_hi"])
+    text("pill", x + 18, y + 9 - 2, label, f_pill, C["accent_text"], bg=C["card_hi"])
+    y += S(58)
 
     # owner/repo
-    f_mono_s = load_font("mono", 26)
-    full = f"{payload['owner']}/{payload['repo']}"
-    d.text((x, y), full, font=f_mono_s, fill=FAINT)
-    y += 52
+    f_mono_s = F("mono", 26)
+    text("owner", x, y, f"{payload['owner']}/{payload['repo']}", f_mono_s, C["faint"])
+    y += S(52)
 
     # 中文名（大字，最多 2 行）
     name_zh = payload.get("name_zh") or payload["repo"]
     font_name, lines, lead = fit_block(
         d, name_zh, "cn_bold", W - PAD * 2, 2,
-        int(78 * title_scale), int(50 * title_scale), lead_mul)
+        S(int(78 * title_scale)), S(int(50 * title_scale)), lead_mul)
     for ln in lines:
-        d.text((x, y), ln, font=font_name, fill=TEXT)
+        text("name", x, y, ln, font_name, C["text"])
         y += lead
-    y += 14
+    y += S(14)
 
-    # 一句话定位
+    # 一句话定位（左边有 26px 的强调竖条 + 缩进，所以可用宽度要扣掉）
     tagline = payload.get("tagline", "")
     if tagline:
+        tw = W - PAD * 2 - 26
         font_t, lines_t, lead_t = fit_block(
-            d, tagline, "cn_bold", W - PAD * 2, 3, 42, 30, lead_mul + 0.04)
-        # 左侧强调竖条
-        d.rounded_rectangle([x, y + 4, x + 6, y + lead_t * len(lines_t) - 12],
-                            radius=3, fill=ACCENT)
+            d, tagline, "cn_bold", tw, 3, S(42), S(30), lead_mul + 0.04)
+        rect("tagline_bar", (x, y + 4, x + 6, y + lead_t * len(lines_t) - 12),
+             3, C["accent"])
         tx = x + 26
         for ln in lines_t:
-            d.text((tx, y), ln, font=font_t, fill=ACCENT_TEXT)
+            text("tagline", tx, y, ln, font_t, C["accent_text"], max_w=tw)
             y += lead_t
-        y += 34
+        y += S(34)
 
     # 它能解决什么
     pains = [p for p in (payload.get("pain") or []) if p][:3]
+    if "pain3" in skip:
+        pains = pains[:2]
+    if "pain2" in skip:
+        pains = pains[:1]
+    if "pain" in skip:
+        pains = []
     if pains:
-        f_sec = load_font("cn_bold", 26)
-        d.text((x, y), "它能解决什么", font=f_sec, fill=FAINT)
-        y += 54
-        f_b = load_font("cn", 33)
+        f_sec = F("cn_bold", 26)
+        text("section", x, y, "它能解决什么", f_sec, C["faint"])
+        y += S(54)
+        f_b = F("cn", 33)
         for p in pains:
-            d.ellipse([x + 2, y + 14, x + 12, y + 24], fill=GREEN)
+            rect("pain_dot", (x + 2, y + 14, x + 12, y + 24), 5, C["good"])
             lines_p = wrap_cjk(d, p, f_b, W - PAD * 2 - 44)
             for ln in lines_p:
-                d.text((x + 36, y), ln, font=f_b, fill=TEXT)
-                y += 48
-            y += 10
-        y += 18
+                text("pain", x + 36, y, ln, f_b, C["text"], max_w=W - PAD * 2 - 44)
+                y += S(48)
+            y += S(10)
+        y += S(18)
 
     # 适合谁
-    for_who = payload.get("for_who", "")
+    for_who = "" if "for_who" in skip else payload.get("for_who", "")
     if for_who:
-        f_sec = load_font("cn_bold", 26)
-        d.text((x, y), "适合谁", font=f_sec, fill=FAINT)
-        y += 50
-        f_w = load_font("cn", 31)
-        lines_w = wrap_cjk(d, for_who, f_w, W - PAD * 2 - 48)[:3]
-        block_h = len(lines_w) * 46 + 32
-        d.rounded_rectangle([x, y, W - PAD, y + block_h], radius=18, fill=CARD)
-        ty = y + 16
+        text("section", x, y, "适合谁", f_sec, C["faint"])
+        y += S(50)
+        f_w = F("cn", 31)
+        lines_w = wrap_cjk(d, for_who, f_w, W - PAD * 2 - 48)
+        if len(lines_w) > 3:
+            note("for_who", "".join(lines_w[3:]))
+            lines_w = lines_w[:3]
+        block_h = len(lines_w) * S(46) + S(32)
+        rect("for_who_card", (x, y, W - PAD, y + block_h), 18, C["card"])
+        ty = y + S(16)
         for ln in lines_w:
-            d.text((x + 24, ty), ln, font=f_w, fill=TEXT)
-            ty += 46
-        y += block_h + 30
+            text("for_who", x + 24, ty, ln, f_w, C["text"], bg=C["card"])
+            ty += S(46)
+        y += block_h + S(30)
 
     # 怎么开始（可以是命令，也可以是一句人话）
-    start = payload.get("start") or payload.get("install", "")
+    start = "" if "start" in skip else (payload.get("start") or payload.get("install", ""))
     if start:
         is_cmd = bool(start) and not has_cjk(start)
-        f_cmd = load_font("mono" if is_cmd else "cn", 27)
+        f_cmd = F("mono" if is_cmd else "cn", 27)
         shown = ("$ " + start) if is_cmd else start
-        lines_c = wrap_cjk(d, shown, f_cmd, W - PAD * 2 - 40)[:3]
-        block_h = len(lines_c) * 40 + 28
-        d.rounded_rectangle([x, y, W - PAD, y + block_h], radius=16, fill=CARD_HI)
-        ty = y + 14
+        lines_c = wrap_cjk(d, shown, f_cmd, W - PAD * 2 - 40)
+        if len(lines_c) > 3:
+            note("start", "".join(lines_c[3:]))
+            lines_c = lines_c[:3]
+        block_h = len(lines_c) * S(40) + S(28)
+        rect("start_card", (x, y, W - PAD, y + block_h), 16, C["card_hi"])
+        ty = y + S(14)
         for i, ln in enumerate(lines_c):
-            d.text((x + 20, ty), ln, font=f_cmd,
-                   fill=(GREEN if (is_cmd and i == 0) else TEXT))
-            ty += 40
-        y += block_h + 26
+            text("start", x + 20, ty, ln, f_cmd,
+                 (C["good_text"] if (is_cmd and i == 0) else C["text"]),
+                 max_w=W - PAD * 2 - 40, bg=C["card_hi"])
+            ty += S(40)
+        y += block_h + S(26)
 
-    # ---- 结论（可选，底部对齐，填掉下半部的空） ----
+    return ops, int(y)
+
+
+def fit_content(d, payload: dict, style: dict) -> tuple[list[dict], float, tuple, int]:
+    """从最舒展的排版开始试，塞不下就整体缩字号，再不行才省次要区块。
+
+    返回 (ops, 字号倍率, 省略的区块, 正文流占到的 y)。
+    """
+    need_verdict = bool(payload.get("verdict"))
+    # 结论块最低要求：结论可以贴着正文放（老排版就这样），但不能压到页脚线
+    reserve = VERDICT_MIN_H if need_verdict else 0
+    for skip in FIT_SKIPS:
+        for scale in FIT_SCALES:
+            ops, bottom = plan_content(d, payload, style, scale, skip)
+            if bottom + reserve <= VERDICT_BOTTOM_LIMIT:
+                return ops, scale, skip, bottom
+    ops, bottom = plan_content(d, payload, style, FIT_SCALES[-1], FIT_SKIPS[-1])
+    return ops, FIT_SCALES[-1], FIT_SKIPS[-1], bottom
+
+
+def plan_verdict(d, payload: dict, style: dict, top: int) -> tuple[list[dict], dict]:
+    """结论块：在正文下方剩余空间里居中；放不下就缩字号，再不行才截断并报告。"""
     verdict = payload.get("verdict", "")
-    foot_line = H - PAD - 96 - 34
-    if verdict:
-        avail = foot_line - 24 - y
-        f_v = load_font("cn", 29)
-        for size in range(30, 21, -1):
-            f_v = load_font("cn", size)
-            lines_v = wrap_cjk(d, verdict, f_v, W - PAD * 2 - 52)
-            if len(lines_v) * int(size * 1.45) + 34 <= avail:
-                break
+    ops: list[dict] = []
+    if not verdict:
+        return ops, {}
+    C = _palette(style)
+    x = PAD
+    foot_line = FOOT_LINE
+    # 老排版的口径：结论可以贴到正文底下，但它的底边不许越过页脚线上方 14px
+    avail = foot_line - 24 - top
+    f_v = load_font("cn", 22)
+    lines_v: list[str] = []
+    step = 31
+    for size in range(30, 21, -1):
+        f = load_font("cn", size)
+        step = int(size * 1.45)
+        lv = wrap_cjk(d, verdict, f, W - PAD * 2 - 52)
+        if len(lv) * step + 34 <= avail:
+            f_v, lines_v = f, lv
+            break
+    else:
+        f_v = load_font("cn", 22)
+        step = int(22 * 1.45)
+        lines_v = wrap_cjk(d, verdict, f_v, W - PAD * 2 - 52)
+
+    info: dict = {}
+    if len(lines_v) > 5:
+        info = {"field": "verdict", "dropped": "".join(lines_v[5:])}
         lines_v = lines_v[:5]
-        block_h = len(lines_v) * int(f_v.size * 1.45) + 34
-        # 在「内容末尾」和「页脚分割线」之间居中，避免短内容时出现一大块空洞
-        top_limit = y + 24
-        bottom_limit = foot_line - 24 - block_h
-        by = min(bottom_limit, max(top_limit, y + max(0, (bottom_limit - y) // 2)))
-        by = max(by, y)
-        d.rounded_rectangle([x, by, W - PAD, by + block_h], radius=18, fill=CARD)
-        d.rounded_rectangle([x, by + 10, x + 5, by + block_h - 10], radius=3, fill=ACCENT2)
-        ty = by + 17
-        for ln in lines_v:
-            d.text((x + 26, ty), ln, font=f_v, fill=TEXT)
-            ty += int(f_v.size * 1.45)
+    block_h = len(lines_v) * step + 34
+    # 塞不进「正文底 → 页脚线」之间时，从结论尾部删行（而不是压到数据条上）
+    budget = VERDICT_BOTTOM_LIMIT - top
+    while len(lines_v) > 1 and block_h > budget:
+        lines_v = [*lines_v[:-1]]
+        info = {"field": "verdict", "dropped": "".join(lines_v[len(lines_v) - 1:])}
+        block_h = len(lines_v) * step + 34
+    top_limit = top + 24
+    bottom_limit = foot_line - 24 - block_h
+    by = min(bottom_limit, max(top_limit, top + max(0, (bottom_limit - top) // 2)))
+    by = max(by, top)                                    # 内容短时贴着正文放
+    by = min(by, VERDICT_BOTTOM_LIMIT - block_h)         # 绝不越过页脚线
+    by = max(by, 0)
+    ops.append({"kind": "rect", "section": "verdict_card", "radius": 18,
+                "box": (x, by, W - PAD, by + block_h), "fill": C["card"]})
+    ops.append({"kind": "rect", "section": "verdict_bar", "radius": 3,
+                "box": (x, by + 10, x + 5, by + block_h - 10), "fill": C["accent_2"]})
+    ty = by + 17
+    for ln in lines_v:
+        ops.append({"kind": "text", "section": "verdict", "xy": (x + 26, ty),
+                    "text": ln, "font": f_v, "fill": C["text"],
+                    "max_w": W - PAD * 2 - 52, "bg": C["card"]})
+        ty += step
+    return ops, info
+
+
+def _paint_ops(img: Image.Image, d, ops: list[dict], audit: Audit) -> None:
+    for op in ops:
+        if op["kind"] == "rect":
+            d.rounded_rectangle(list(op["box"]), radius=op["radius"], fill=op["fill"])
+            audit.rects.append({"section": op["section"], "box": list(op["box"]),
+                                "radius": op["radius"], "fill": list(op["fill"])})
+        elif op["kind"] == "text":
+            audit.add_text(d, img, op["section"], op["xy"], op["text"],
+                           op["font"], op["fill"], op["max_w"], op["bg"])
+            d.text(op["xy"], op["text"], font=op["font"], fill=op["fill"])
+
+
+def render(payload: dict, out_path: Path, style: dict | None = None,
+           audit: Audit | None = None) -> Path:
+    style = style or DEFAULT_STYLE
+    C = _palette(style)
+    audit = audit if audit is not None else Audit()
+
+    img = build_background(style)
+    d = ImageDraw.Draw(img)
+    audit.bg_stats = _bg_stats(img)
+    audit.frames = {
+        "canvas": (0, 0, W, H),
+        "safe": (PAD - 2, 0, W - PAD + 2, CONTENT_BOTTOM),
+        "content_bottom": CONTENT_BOTTOM,
+        "foot_line": FOOT_LINE,
+        "data_bar": (0, FOOT_LINE + 1, W, H - PAD + 6),
+        "credit": (0, H - 40, W, H),
+    }
+
+    # 正文：先排版、再落笔；落笔时每块文字的位置都记进 audit
+    ops, scale, skip, flow_bottom = fit_content(d, payload, style)
+    audit.scale = scale
+    audit.dropped = [SKIP_LABELS[s] for s in skip]
+    _paint_ops(img, d, ops, audit)
+    for op in ops:
+        if op["kind"] == "note":
+            audit.truncated.append({"field": op["field"], "dropped": op["dropped"]})
+
+    # 结论（底部对齐，填掉内容与页脚之间的空）
+    vops, vinfo = plan_verdict(d, payload, style, flow_bottom)
+    _paint_ops(img, d, vops, audit)
+    if vinfo:
+        audit.truncated.append(vinfo)
 
     # ---- 底部数据条 ----
     foot_y = H - PAD - 96
-    d.line([(PAD, foot_line), (W - PAD, foot_line)], fill=LINE, width=2)
-
+    d.line([(PAD, FOOT_LINE), (W - PAD, FOOT_LINE)], fill=C["line"], width=2)
     f_lbl = load_font("cn", 22)
     items = [
         ("★ " + fmt_num(payload.get("stars", 0)), "stars"),
@@ -572,9 +836,13 @@ def render(payload: dict, out_path: Path, style: dict | None = None) -> Path:
     col_w = (W - PAD * 2) // len(items)
     for i, (val, lbl) in enumerate(items):
         cx = PAD + col_w * i
-        font_v, size_v = fit_single(d, val, "cn_bold", col_w - 44, 40, 20)
-        d.text((cx, foot_y + (40 - size_v)), val, font=font_v, fill=TEXT)
-        d.text((cx, foot_y + 54), lbl, font=f_lbl, fill=FAINT)
+        val, font_v = fit_value(d, val, "cn_bold", col_w - 44)
+        size_v = font_v.size
+        vy = foot_y + (40 - size_v)
+        audit.add_text(d, img, "data", (cx, vy), val, font_v, C["text"], col_w - 44)
+        d.text((cx, vy), val, font=font_v, fill=C["text"])
+        audit.add_text(d, img, "data_label", (cx, foot_y + 54), lbl, f_lbl, C["faint"])
+        d.text((cx, foot_y + 54), lbl, font=f_lbl, fill=C["faint"])
 
     # 右上角话题标签
     topics = [t for t in (payload.get("topics") or []) if t][:3]
@@ -583,7 +851,16 @@ def render(payload: dict, out_path: Path, style: dict | None = None) -> Path:
         total_w = sum(text_w(d, "#" + t, f_t) + 16 for t in topics) + 16 * (len(topics) - 1)
         tx = W - PAD - total_w
         for t in topics:
-            tx = pill(d, tx, 66, "#" + t, f_t, ACCENT2_TEXT, CARD_HI, padx=8, pady=6) + 16
+            tw = text_w(d, "#" + t, f_t) + 16
+            th = f_t.size + 12
+            d.rounded_rectangle([tx, 66, tx + tw, 66 + th], radius=th // 2,
+                                fill=C["card_hi"])
+            audit.rects.append({"section": "topics", "box": [tx, 66, tx + tw, 66 + th],
+                                "radius": th // 2, "fill": list(C["card_hi"])})
+            audit.add_text(d, img, "topics", (tx + 8, 66 + 6 - 2), "#" + t,
+                           f_t, C["accent2_text"], bg=C["card_hi"])
+            d.text((tx + 8, 66 + 6 - 2), "#" + t, font=f_t, fill=C["accent2_text"])
+            tx += tw + 16
 
     # 署名：卡片被转发时链接跟着走 —— 这是这个工具唯一的自然传播入口
     if (style.get("decor") or {}).get("credit", True):
@@ -591,13 +868,13 @@ def render(payload: dict, out_path: Path, style: dict | None = None) -> Path:
         credit = "gh-zh-card · github.com/PR-JHL/gh-zh-card"
         cw = text_w(d, credit, f_cr)
         # 把弱化色再往背景压 45%，保证不抢内容
-        credit_col = tuple(int(c + (BG_BOT[i] - c) * 0.45) for i, c in enumerate(FAINT))
+        credit_col = tuple(int(c + (C["bg_bot"][i] - c) * 0.45) for i, c in enumerate(C["faint"]))
+        audit.add_text(d, img, "credit", ((W - cw) // 2, H - 32), credit, f_cr, credit_col)
         d.text(((W - cw) // 2, H - 32), credit, font=f_cr, fill=credit_col)
 
     draw_decor_over(d, style)
     img.save(out_path, "PNG", optimize=True)
     return out_path
-
 
 # ---------------------------------------------------------------- 文案
 def to_markdown(payload: dict) -> str:
@@ -662,12 +939,17 @@ def main() -> None:
     ap.add_argument("--print", action="store_true", dest="do_print", help="把 payload 打印出来")
     ap.add_argument("--offline", action="store_true",
                     help="不联网：统计数字须已写在 payload 里（用于离线/代理不通的环境）")
+    ap.add_argument("--save", action="store_true",
+                    help="把 --fetch 抓到的真数据（含抓取时间）写回 --payload 文件")
     ap.add_argument("--style", default="obsidian",
                     help="风格 id（styles/<id>.json）或风格 JSON 的路径，默认 obsidian")
     ap.add_argument("--style-dir", action="append", default=[],
                     help="额外风格目录，可重复；用来加载 design-cards 里的风格库")
     ap.add_argument("--no-credit", action="store_true",
                     help="不画底部署名（默认画：卡片被转发时带上项目链接）")
+    ap.add_argument("--check", action="store_true",
+                    help="渲染后自检：版面 / 文案长度 / 可读性，有问题退出码 1")
+    ap.add_argument("--audit-json", help="把自检明细（每块文字的位置、对比度）写成 JSON")
     ap.add_argument("--list-styles", action="store_true",
                     help="列出 styles/ 里所有可用风格，然后退出")
     args = ap.parse_args()
@@ -699,7 +981,21 @@ def main() -> None:
     if args.payload:
         payload = json.loads(Path(args.payload).read_text(encoding="utf-8"))
     if args.fetch and not args.offline:
-        payload = {**fetch_repo(args.fetch), **payload}
+        fresh = fetch_repo(args.fetch)
+        # 以前的写法是 {**fresh, **payload}：payload 里的旧数字会把刚抓到的真数据盖掉，
+        # 于是「重新抓一次」根本不会更新星数。统计字段必须让真数据赢，文案字段保持不动。
+        for k, v in fresh.items():
+            if k == "stats_fetched_at" or k not in payload:
+                payload[k] = v
+            elif k in ("stars", "forks", "language", "license", "updated"):
+                payload[k] = v
+        if args.save:
+            if not args.payload:
+                ap.error("--save 需要同时指定 --payload（要写回哪个文件）")
+            Path(args.payload).write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            print(f"已把真数据写回: {args.payload}（stars={payload.get('stars')}, "
+                  f"抓取时间 {payload['stats_fetched_at']}）")
     if not payload:
         ap.error("需要 --payload 或 --fetch")
 
@@ -714,7 +1010,8 @@ def main() -> None:
     style = load_style(args.style, [Path(p) for p in args.style_dir])
     if args.no_credit:
         style.setdefault("decor", {})["credit"] = False
-    png = render(payload, out_dir / f"{stem}.png", style)
+    audit = Audit()
+    png = render(payload, out_dir / f"{stem}.png", style, audit=audit)
     print(f"风格: {style.get('name_zh') or style.get('id')}")
 
     if args.do_print:
@@ -728,6 +1025,23 @@ def main() -> None:
         cap = out_dir / f"{stem}.caption.txt"
         cap.write_text(to_caption(payload), encoding="utf-8")
         print(f"文案: {cap}")
+
+    rc = 0
+    if args.check or args.audit_json:
+        import card_check
+        findings = card_check.check(audit, payload)
+    if args.check:
+        print()
+        print(card_check.report(findings, audit))
+        rc = 1 if any(f.level == "error" for f in findings) else 0
+    if args.audit_json:
+        Path(args.audit_json).write_text(json.dumps({
+            "findings": [f.__dict__ for f in findings],
+            "audit": audit.to_json(),
+        }, ensure_ascii=False, indent=1), encoding="utf-8")
+        print(f"自检明细: {args.audit_json}")
+    if rc:
+        sys.exit(rc)
 
 
 if __name__ == "__main__":

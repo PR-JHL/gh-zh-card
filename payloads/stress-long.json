@@ -1,0 +1,22 @@
+{
+  "_note": "自检用的压力样本：每一项都写超长。不是真实仓库，用来验证「内容塞不下时卡片不会压坏」。",
+  "owner": "acme-labs",
+  "repo": "super-tool",
+  "url": "https://github.com/acme-labs/super-tool",
+  "name_zh": "SuperTool 超长名字测试版",
+  "tagline": "把一件本来要折腾一整天的事情变成一条命令，而且出错的时候它会告诉你是哪一步坏了，不是只给你一个报错码",
+  "pain": [
+    "每次部署都要手动改五个配置文件、三台机器、两套环境变量，改漏一个就是半夜被叫起来查故障的那种事故",
+    "回滚方案写在 wiki 里，真正出事的时候没人来得及翻，最后都是先把服务重启一遍碰运气，运气不好就丢数据",
+    "新同事上手要花两周，因为所有步骤都只存在老员工的记忆里，文档永远落后三个版本，越写越没人敢信",
+    "权限和密钥散落在每个人的笔记本上，谁离职谁就带走一部分，审计的时候一个都说不清楚来源"
+  ],
+  "for_who": "一个人维护三到五个服务、每天被杂事打断、想把重复操作固定成一条命令的后端工程师",
+  "start": "python -m supertool.cli --bootstrap --environment=production --config-dir=~/.supertool/config",
+  "verdict": "一句话说不完的那种工具，但如果你正好被上面那些事折磨过，它值得花一个下午读文档。注意它默认会接管服务重启权限，先在小环境里跑一遍再上生产。",
+  "stars": 1234567,
+  "language": "Rust",
+  "license": "AGPL-3.0",
+  "updated": "2026-11-18T02:00:00Z",
+  "topics": ["deployment", "rollback", "secrets-management"]
+}

@@ -62,6 +62,9 @@ python gh_card.py --fetch DIYgod/pinky --payload payloads/pinky.json --out out/ 
 python gh_card.py --payload payloads/pinky.json --offline --out examples/ --name 01-pinky --md --caption
 ```
 
+`--fetch` 会用 API 的真数据覆盖 payload 里的旧统计（文案字段不动）。再加 `--save`，数字和抓取时间
+会被写回 payload —— 之后 `copy_check.py` 才能离线复核，卡片也永远能回答「发布时星数是多少」。
+
 三条产出：
 
 | 文件 | 用途 |
@@ -105,6 +108,59 @@ python gh_card.py ... --style swiss-international  # 瑞士国际主义（最稳
 
 重新生成总览图：`python gallery.py`
 
+## 自检：一只管文案，一只管版面
+
+这个工具只有两个地方会「说谎」：**文案说错**，和**版面排坏**。两只手各管一头。
+
+### 文案体检（渲染前）
+
+```bash
+python copy_check.py payloads/pinky.json           # 离线：文案 vs payload
+python copy_check.py daily/2026-11-19/ --online    # 在线：顺便抓实时数据核对
+```
+
+| 类别 | 检查什么 |
+|---|---|
+| 数字 | 文案里的星数、推送天数、许可证，跟 payload（或实时 API）对不对得上 |
+| 时效 | 数字是什么时候抓的（`--max-age`）—— 涨得快的仓库，星数一上午就能差 30% |
+| 结构 | 缺字段、`start` 带 `$`、tagline 没中文、痛点写成「支持截图/支持点击」这种功能清单 |
+| 夸大 | 「最强 / 史上最 / 颠覆 / 绝对」这类当场能被证伪的词 |
+| 长度 | 超预算时直接算后果：这张卡会缩到多少字号、结论会不会被截断 |
+
+它不判断「文案有没有说到点上」——那要读 README，机器做不了。
+
+### 版面自检（渲染后）
+
+好卡片和「压坏了的卡片」差别很小，但压坏的那张读者一眼就能看出不专业。所以渲染是
+**先排版、再落笔**：内容塞不下时先整体缩字号，再省次要区块，绝不会静默压到页脚数据条上。
+
+```bash
+python gh_card.py --payload payloads/pinky.json --offline --out out/ --check
+```
+
+`--check` 断言的是这些事：
+
+| 类别 | 检查什么 |
+|---|---|
+| 版面 | 文字出界、压页脚数据条、两块文字互相压住、单行超宽 |
+| 文案 | 为了塞进版面被省略 / 被截断的字段 —— 该改文案，不是改排版 |
+| 可读性 | 对比度、字号被缩得太小、豆腐块（缺字形）、深色卡发闷 |
+
+<p align="center">
+  <img src="docs/long-copy-before-after.jpg" width="92%">
+</p>
+<p align="center"><sub>同一份超长文案：左＝修复前（命令块压到 stars 上，结论块压到署名），右＝现在（自动缩到 88%，版面干净）</sub></p>
+
+改风格、改排版之后跑一遍回归：
+
+```bash
+python selftest.py            # 44 套风格 × 5 份 payload，逐张自检（约 2 分钟）
+python selftest.py --quick    # 6 套代表风格，十来秒
+python copy_check.py --selftest   # 体检工具自己的用例（好文案要放行、坏文案要被抓到）
+```
+
+`--sheet docs/long-copy.jpg` 还能拼一张「同一份超长文案在 8 套风格下的样子」，改排版前后对比很直观。
+
 ## payload 字段
 
 | 字段 | 必填 | 说明 |
@@ -145,8 +201,10 @@ gh-zh-card · github.com/PR-JHL/gh-zh-card
 
 - 不判断代码质量 —— 没跑过测试就不替项目背书
 - 不做技术翻译 —— 回答「该不该看」，不是「原文说了什么」
+- 文案超长时会自动缩字号、省略次要区块，并让 `--check` 报错 —— 但内容该删还得删，
+  脚本能保住版面，保不住「一张图说清一件事」
 - 需要本地中文字体：Windows 微软雅黑 / macOS 苹方 / Linux Noto CJK
-- 排版只支持中文 + 英文混排；纯日文/韩文可能缺字形
+- 排版只支持中文 + 英文混排；纯日文/韩文可能缺字形（`--check` 会报出豆腐块）
 
 ## English
 

@@ -173,8 +173,10 @@ def main() -> None:
         print(f"   {(p.get('description') or '')[:100]}")
     print()
     print("下一步：读 candidates.json 里的 readme，为每个项目写 payload.json，然后：")
+    print(f"  python copy_check.py daily/{today}/ --online   # 先体检文案和数字")
     print(f"  python gh_card.py --payload daily/{today}/<slug>.json --offline "
-          f"--out daily/{today}/ --style <id>")
+          f"--out daily/{today}/ --style <id> --check")
+    print("（--check 有 error 就改文案，别改排版）")
 
 
 if __name__ == "__main__":
