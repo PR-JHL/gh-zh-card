@@ -1,0 +1,19 @@
+{
+  "_note": "边界样本：三个话题共 59 个字符（连井号 62），右上角一行放不下就会压到左上角的「GitHub 中文速览」胶囊上。话题是仓库数据，同样改不了 —— 渲染器要自己缩字号、省掉放不下的那几个。",
+  "owner": "demo",
+  "repo": "long-topics",
+  "url": "https://github.com/demo/long-topics",
+  "name_zh": "超长话题标签",
+  "tagline": "三个话题共 59 个字符（连井号 62），验证右上角那一行会不会撞到左边的胶囊",
+  "pain": [
+    "仓库的 topics 也是数据，写卡片的人只能删不能编",
+    "所以渲染器得自己适配：先缩字号，再省掉放不下的"
+  ],
+  "for_who": "改渲染器的人",
+  "verdict": "右上角话题和左上角胶囊必须各自待在自己的位置。",
+  "stars": 88,
+  "language": "TypeScript",
+  "license": "MIT",
+  "updated": "2026-11-21T08:00:00Z",
+  "topics": ["machine-learning", "large-language-model", "artificial-intelligence"]
+}

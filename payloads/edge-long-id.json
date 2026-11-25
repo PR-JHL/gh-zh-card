@@ -1,0 +1,20 @@
+{
+  "_note": "边界样本：owner/repo 一共 103 个字符。这种标识符是数据，改不了 —— 渲染器必须自己缩字号或中间省略，不能冲出画面，也不该在 --check 里报错。",
+  "owner": "open-telemetry-community-contributors-organization",
+  "repo": "instrumentation-for-observability-pipeline-collector",
+  "url": "https://github.com/open-telemetry-community-contributors-organization/instrumentation-for-observability-pipeline-collector",
+  "name_zh": "超长标识符",
+  "tagline": "owner/repo 一共 103 个字符，用来验证标识符行会不会顶出画面右边缘",
+  "pain": [
+    "仓库名是数据，不是文案：写卡片的人没法把它改短",
+    "所以渲染器得自己兜底：先缩字号，再放不下才中间省略"
+  ],
+  "for_who": "改渲染器的人",
+  "start": "python selftest.py --quick",
+  "verdict": "标识符行应该完整落在安全边距内，--check 不该报错。",
+  "stars": 4321,
+  "language": "Go",
+  "license": "Apache-2.0",
+  "updated": "2026-11-22T08:00:00Z",
+  "topics": ["opentelemetry", "observability"]
+}

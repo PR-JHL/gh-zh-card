@@ -14,6 +14,9 @@
   版面（error）  出界、压页脚、两块文字互相压住、单行超宽
   文案（error）  为了塞进版面被省略 / 被截断的字段 —— 该改文案，不是改版面
   可读性（warn） 字号被缩得太小、对比度偏低、深色卡没有明暗层次、缺字形（豆腐块）
+  信息量（warn） 版面干净、但整张卡下半截是空的 —— 这种卡替代不了 README
+  数据（info）   owner/repo、话题太长时，渲染器自己做的适配（缩字号 / 中间省略 / 省掉）
+  形状（warn）   payload 的类型写错了、渲染器已经就地救回来（pain 写成字符串、stars 写成 null…）
 
 用法（通常不直接调，走 `python gh_card.py ... --check`）：
 
@@ -41,6 +44,10 @@ DEAD_BLACK_SPREAD = 8
 # 文字与底色的对比度：低于 2.2 基本读不了，低于 3.0 只是偏淡（弱化标签是设计的一部分）
 CONTRAST_ERROR = 2.2
 CONTRAST_WARN = 3.0
+
+# 正文占用不到这个比例的竖向空间，就算「太空」：版面没坏，但替代不了 README
+CONTENT_TOP = 66
+THIN_RATIO = 0.55
 
 
 @dataclass
@@ -117,6 +124,9 @@ def missing_glyphs(audit) -> dict[str, list[str]]:
 # ---------------------------------------------------------------- 断言
 def check(audit, payload: dict | None = None) -> list[Finding]:
     out: list[Finding] = []
+    if payload is not None:
+        # 只为了下面「缺哪几块」这类统计算得准（修形状的记录已经在 audit 里了，不再重复报）
+        payload, _, _ = gh_card.normalize_payload(payload)
     frames = audit.frames or {}
     foot_line = frames.get("foot_line", gh_card.FOOT_LINE)
     data_bar = frames.get("data_bar", (0, foot_line + 1, gh_card.W, gh_card.H - gh_card.PAD + 6))
@@ -246,6 +256,51 @@ def check(audit, payload: dict | None = None) -> list[Finding]:
                                f"页脚「{a['text']}」和「{b['text']}」贴得太近（间距 {gap}px）",
                                {"gap": gap}))
 
+    # 11) 内容太薄：版面干净不是终点 —— 一张大半是空白的卡回答不了「值不值得看」
+    if payload is not None and getattr(audit, "flow_bottom", 0):
+        usable = gh_card.VERDICT_BOTTOM_LIMIT - CONTENT_TOP
+        used = max(0, audit.flow_bottom - CONTENT_TOP)
+        ratio = (used / usable) if usable > 0 else 1.0
+        if ratio < THIN_RATIO:
+            missing = []
+            pains = [p for p in (payload.get("pain") or []) if p]
+            if not pains:
+                missing.append("整块「它能解决什么」")
+            elif len(pains) < 3:
+                missing.append(f"另外 {3 - len(pains)} 条痛点")
+            if not (payload.get("for_who") or "").strip():
+                missing.append("「适合谁」")
+            if not (payload.get("start") or payload.get("install") or "").strip():
+                missing.append("「怎么开始」")
+            out.append(Finding("warn", "THIN_CARD",
+                               f"正文只占了版面高度的 {ratio:.0%}（{used}px / {usable}px），"
+                               f"下半截基本是空的；这样的卡替代不了 README。"
+                               f"缺：{'、'.join(missing) or '内容'}。补内容比调排版有用。",
+                               {"ratio": round(ratio, 3), "used_px": used,
+                                "usable_px": usable, "missing": missing}))
+
+    # 12) 渲染器替「数据行」做的适配：owner/repo 太长、话题太长。
+    #     仓库名和 topics 都是数据，改不了，所以这是 info 而不是「必须修」。
+    for n in getattr(audit, "notes", []):
+        sec = n.get("section", "?")
+        if n.get("how") == "ellipsis":
+            msg = (f"{sec} 太长放不下，已中间省略：{n.get('text', '')}"
+                   f"（仓库数据，不是文案，不用改）")
+        elif sec == "topics":
+            msg = f"右上角话题放不下，字号缩到 {n.get('size')}px"
+            if n.get("dropped"):
+                msg += f"、省掉 {len(n['dropped'])} 个：{', '.join(n['dropped'])}"
+        else:
+            msg = f"{sec} 太长，字号从 {n.get('from')}px 缩到 {n.get('size')}px 才放下"
+        out.append(Finding("info", "DATA_FITTED", msg, n))
+
+    # 13) payload 的类型问题：渲染器救过的（提醒）/ 救不了而拒绝渲染的（错误）
+    for n in getattr(audit, "payload_fixes", []):
+        out.append(Finding("info" if n.get("kind") == "typo" else "warn",
+                           "PAYLOAD_FIXED", n.get("message", "payload 有类型问题"), n))
+    for n in getattr(audit, "payload_blocked", []):
+        out.append(Finding("error", "PAYLOAD_BROKEN", n.get("message", "payload 形状坏了"), n))
+
     # 10) 文案超长时，顺手把当前字数也算出来 —— 提示「删多少」比只说「太长了」有用
     if payload and any(f.code.startswith("COPY_") for f in out):
         pains = [len(p) for p in (payload.get("pain") or []) if p]
@@ -309,7 +364,11 @@ def main() -> int:
     style = gh_card.load_style(args.style)
     audit = gh_card.Audit()
     out_png = Path(args.out) if args.out else Path(args.payload).with_suffix(".check.png")
-    gh_card.render(payload, out_png, style, audit=audit)
+    try:
+        gh_card.render(payload, out_png, style, audit=audit)
+    except gh_card.PayloadError as e:
+        print(f"payload 有问题，没有渲染：{e}", file=sys.stderr)
+        return 1
     findings = check(audit, payload)
     print(report(findings, audit))
     if args.json:

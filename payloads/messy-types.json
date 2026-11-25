@@ -1,0 +1,17 @@
+{
+  "_note": "边界样本：payload 的类型全写错了 —— pain 是一整段话、verdict 是列表、stars 是 null、topics 是一行逗号分隔、还有个 `tag_line` 拼错的字段。这是 agent 写 JSON 时最常见的错法。渲染器应该就地纠正并在 --check 里说出来，而不是渲染出「手」「机」「上」三条单字痛点、页脚写「★ None」，或者直接抛 AttributeError 崩掉。",
+  "owner": "demo",
+  "repo": "messy-types",
+  "name_zh": "写错类型的 payload",
+  "tagline": "agent 写 JSON 时最常见的错：该是列表的地方写成了一整段话",
+  "pain": "第一条痛点被写成一整段话；第二条也塞在同一行；第三条用分号隔开",
+  "for_who": "手写 payload 的人",
+  "start": "python gh_card.py --check",
+  "verdict": ["结论被写成了列表", "渲染器应该用逗号把它接回一句"],
+  "stars": null,
+  "language": "Python",
+  "license": "MIT",
+  "updated": "2026-11-24T08:00:00Z",
+  "topics": "payload, guard",
+  "tag_line": "拼错的字段名"
+}

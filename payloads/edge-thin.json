@@ -1,0 +1,13 @@
+{
+  "_note": "边界样本：只有名字、一句定位和一句结论（agent 偷懒时的真实产物）。版面是干净的，但整张卡八成是空的 —— 这种卡替代不了 README，自检必须小声说一句「内容太薄」，而不是判「通过」。",
+  "owner": "demo",
+  "repo": "thin-card",
+  "url": "https://github.com/demo/thin-card",
+  "name_zh": "太薄的卡",
+  "tagline": "一个只有一句定位、没有痛点、没有适合谁、没有怎么开始的卡片",
+  "verdict": "版面没坏，但它回答不了「这东西值不值得看」。",
+  "stars": 6,
+  "language": "Python",
+  "license": "MIT",
+  "updated": "2026-11-20T08:00:00Z"
+}

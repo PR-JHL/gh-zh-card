@@ -5,7 +5,7 @@
 加了新风格、改了排版、调了字体之后跑这个，确认没有哪套风格被改坏。
 
 用法：
-    python selftest.py                    # 全部风格 × 5 份 payload（约 2 分钟）
+    python selftest.py                    # 全部风格 × 8 份 payload（约 3 分钟）
     python selftest.py --quick            # 只跑 6 套代表风格（十来秒）
     python selftest.py --sheet docs/long-copy.jpg   # 顺便拼一张长文案对比图
     python selftest.py --json report.json
@@ -15,6 +15,8 @@
     · 文案被省略或截断 → 只统计（长文案样本本来就是用来测降级的）
     · 可读性 warn / info → 只统计
     · tofu 样本必须被 card_check 报出豆腐块，报不出也算失败（自检本身失效）
+    · thin 样本（只有名字 + 一句定位）必须被报出 THIN_CARD，报不出同样算失败
+    · messy 样本（payload 类型全写错）必须被就地纠正并报出 PAYLOAD_FIXED
 """
 from __future__ import annotations
 
@@ -97,6 +99,10 @@ def load_fixtures() -> list[tuple[str, dict, str]]:
         ("pinky", "payloads/pinky.json", "正常文案"),
         ("guizang", "payloads/guizang-game-skill.json", "正常文案"),
         ("stress", "payloads/stress-long.json", "每项都超长"),
+        ("longid", "payloads/edge-long-id.json", "owner/repo 长到 66 字符"),
+        ("longtop", "payloads/edge-long-topics.json", "三个话题都超长"),
+        ("thin", "payloads/edge-thin.json", "只有名字 + 一句定位 + 一句结论"),
+        ("messy", "payloads/messy-types.json", "类型全写错（pain 是字符串、stars 是 null…）"),
     ]:
         p = HERE / rel
         if p.exists():
@@ -147,6 +153,36 @@ def make_sheet(payload: dict, path: Path) -> None:
     print(f"\n长文案对比图: {path} ({path.stat().st_size // 1024} KB)")
 
 
+def check_fit_ident() -> list[str]:
+    """fit_ident 的三条路都得走通：原样 / 缩字号 / 中间省略。
+
+    样本里只有「长到必须省略」那一档，所以这里直接对函数下断言 ——
+    不然「缩字号」那条路没人走过，坏了也不会有人发现。
+    三档样本按当前字体的实际宽度现造，换机器换字体也不会失效。
+    """
+    from PIL import Image, ImageDraw
+
+    d = ImageDraw.Draw(Image.new("RGB", (8, 8)))
+    max_w = gh_card.W - gh_card.PAD * 2
+    unit = "acme-labs/repository-name-"
+    s = unit
+    while gh_card.text_w(d, s, gh_card.load_font("mono", 18)) <= max_w:
+        s += unit
+    mid = s[:-len(unit)]                      # 18px 放得下、26px 放不下
+    cases = [("PR-JHL/repo-preflight", ""), (mid, "shrink"), (mid * 3, "ellipsis")]
+    bad = []
+    for text_in, want in cases:
+        text, font, how = gh_card.fit_ident(d, text_in, "mono", max_w)
+        width = gh_card.text_w(d, text, font)
+        ok = how == want and width <= max_w
+        if how == "ellipsis":
+            ok = ok and "…" in text and text.startswith(text_in[:4]) and text.endswith(text_in[-4:])
+        if not ok:
+            bad.append(f"{len(text_in)} 字符的标识符：期望 {want or '原样'}，"
+                       f"实际 {how or '原样'} / 宽 {width}px / {text}")
+    return bad
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="把所有风格都渲染一遍并自检")
     ap.add_argument("--quick", action="store_true", help="只跑 6 套代表风格")
@@ -162,9 +198,9 @@ def main() -> int:
 
     fixtures = load_fixtures()
     print(f"gh-zh-card selftest · {len(style_files)} 套风格 × {len(fixtures)} 份 payload")
-    print()
-
-    report = {"styles": len(style_files), "fixtures": [], "ok": True}
+    ident_bad = check_fit_ident()
+    print(f"标识符行护栏 {'✓ 原样 / 缩字号 / 中间省略 三条路都对' if not ident_bad else '✗ ' + ident_bad[0]}")
+    report = {"styles": len(style_files), "fixtures": [], "ok": not ident_bad}
     tmpdir = tempfile.TemporaryDirectory()
     try:
         for name, payload, note in fixtures:
@@ -184,6 +220,20 @@ def main() -> int:
             if name == "tofu":
                 ok = bool(glyphs)
                 print(f"{name:8} 缺字形护栏 {'✓ 自检抓到了' if ok else '✗ 没抓到（自检失效）'}")
+            elif name == "thin":
+                # 这张卡版面本身是干净的，唯一的错就是「太空」—— 自检必须自己说出来，
+                # 否则「版面通过」就成了「内容很薄也放行」。
+                thin = [f for r in rows for f in r["findings"] if f["code"] == "THIN_CARD"]
+                ok = not layout and bool(thin)
+                print(f"{name:8} 太空护栏 {'✓ 自检抓到了' if thin else '✗ 没抓到（自检失效）'}"
+                      f"{'  · 还有 ' + str(len(layout)) + ' 个版面错误' if layout else ''}")
+            elif name == "messy":
+                # 这张卡的 payload 类型是坏的：渲染器必须自己救回来并说出来，
+                # 而不是渲染出单字痛点、或者干脆崩掉。
+                fixed = [f for r in rows for f in r["findings"] if f["code"] == "PAYLOAD_FIXED"]
+                ok = not layout and bool(fixed)
+                print(f"{name:8} 类型护栏 {'✓ 自检抓到了 ' + str(len(fixed)) + ' 处修正' if fixed else '✗ 没抓到（自检失效）'}"
+                      f"{'  · 还有 ' + str(len(layout)) + ' 个版面错误' if layout else ''}")
             else:
                 ok = not layout
                 scaled = sum(1 for r in rows if r["scale"] < 1.0)

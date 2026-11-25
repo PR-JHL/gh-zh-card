@@ -21,8 +21,10 @@ MIT License.
 from __future__ import annotations
 
 import argparse
+import difflib
 import json
 import os
+import re
 import sys
 import time
 from datetime import datetime, timezone
@@ -215,6 +217,39 @@ def fit_value(draw, s: str, kind: str, max_w: int, start: int = 40,
     return ((cut.rstrip() + "…") if cut else "…"), font
 
 
+def fit_ident(draw, s: str, kind: str, max_w: int, start: int = 26,
+              min_size: int = 18) -> tuple[str, ImageFont.FreeTypeFont, str]:
+    """owner/repo 这类「数据行」：先缩字号，缩到底还放不下就中间省略。
+
+    返回 (要画的文本, 字体, 处理方式)："" = 原样，"shrink" = 缩过字号，
+    "ellipsis" = 中间省略过。仓库名是**数据**不是文案 —— 在这里报错，
+    等于让人回去改上游仓库，是条死路，所以渲染器必须自己兜住。
+    """
+    size = start
+    font = load_font(kind, size)
+    while size > min_size and text_w(draw, s, font) > max_w:
+        size -= 1
+        font = load_font(kind, size)
+    if text_w(draw, s, font) <= max_w:
+        return s, font, ("shrink" if size != start else "")
+    # 缩到下限仍放不下：保留「开头 … 结尾」，中间省略（省略的总是中间的字符，
+    # 因为 owner 的前缀和 repo 的后缀才是认出这个仓库的部分）
+    font = load_font(kind, min_size)
+    tail_len = min(14, max(6, len(s) // 3))
+    while tail_len > 3:
+        tail = s[-tail_len:]
+        head = ""
+        for ch in s[:-tail_len]:
+            cand = head + ch + "…" + tail
+            if text_w(draw, cand, font) > max_w:
+                break
+            head += ch
+        if text_w(draw, head + "…" + tail, font) <= max_w:
+            return head + "…" + tail, font, "ellipsis"
+        tail_len -= 2
+    return s[-3:] + "…", font, "ellipsis"
+
+
 def fit_block(draw, s: str, kind: str, max_w: int, max_lines: int,
               start: int, min_size: int, lead: float = 1.32):
     """从大字号往小缩，直到塞进 max_lines 行。"""
@@ -240,11 +275,14 @@ def fmt_num(n) -> str:
     """1234 -> 1.2k，123456 -> 123k，1234567 -> 1.2M。
 
     以前只做 k，六位数会被写成 1234.6k（数位读起来是错的）。
+    拿不到数字时写「—」而不是 None：卡片上不能出现一个假装是数字的东西。
     """
+    if n is None:
+        return "—"
     try:
         n = int(n)
     except (TypeError, ValueError):
-        return str(n)
+        return "—"
     if n >= 1_000_000:
         return f"{n / 1_000_000:.1f}M"
     if n >= 100_000:
@@ -271,6 +309,164 @@ def fmt_age(iso: str | None) -> str:
     if days < 365:
         return f"{days // 30} 个月前"
     return f"{days // 365} 年前"
+
+
+# ---------------------------------------------------------------- payload 体检与自愈
+# payload 是 agent（LLM）写的 JSON，它最常见的错不是「文案不好」，而是**类型写错**：
+#   "pain": "一句话"            → 应该是一个列表
+#   "verdict": ["第一句","二句"] → 应该是字符串
+#   "stars": null               → 页脚会写「★ None」
+# 渲染器原来的反应分别是：把字符串按字符拆成三条只有单字的痛点（「手」「机」「上」）、
+# 直接抛 AttributeError 崩掉、页脚写「None」。三种都不该出现在发出去的卡上。
+# 所以进渲染之前先过这一层：能救的就地救并记下来，救不了的明确报错 ——
+# 宁可不出卡，也不出一张坏卡。
+
+KNOWN_FIELDS = {
+    "owner", "repo", "url", "name_zh", "tagline", "pain", "for_who", "start",
+    "install", "verdict", "stars", "forks", "language", "license", "updated",
+    "topics", "stats_fetched_at", "_note",
+    # 合集（collection.json）里的记账字段，不是卡面内容，别当拼写错误提醒
+    "issue", "starred",
+}
+TEXT_FIELDS = ("owner", "repo", "url", "name_zh", "tagline", "for_who", "start",
+               "install", "verdict", "language", "license")
+BULLET_PREFIX = re.compile(r"^\s*(?:[-*•·]|\d+[.、)])\s*")
+
+
+class PayloadError(ValueError):
+    """payload 的形状坏到没法自动修（比如 pain 写成了对象）。"""
+
+
+def _note(field: str, message: str, kind: str = "fixed", **detail) -> dict:
+    return {"field": field, "message": message, "kind": kind, **detail}
+
+
+def _split_items(s: str, pattern: str = r"[\n;；|｜]") -> list[str]:
+    """把「一整段话」拆成条目：按给定的分隔符切，顺手去掉 markdown 列表符号。
+
+    默认只按换行 / 分号 / 竖线切。**不按句号切** —— 一句话里本来就有句号，
+    按句号切会把一句完整的痛点拆成两句半。话题标签另给一套分隔符（逗号、顿号、空格）。
+    """
+    out = []
+    for part in re.split(pattern, s):
+        part = BULLET_PREFIX.sub("", part).strip()
+        if part:
+            out.append(part)
+    return out or ([s.strip()] if s.strip() else [])
+
+
+def _as_text(field: str, v, fixes: list, blocking: list):
+    if v is None:
+        return None
+    if isinstance(v, str):
+        return v.strip()
+    if isinstance(v, bool):
+        blocking.append(_note(field, f"`{field}` 是布尔值 {v}，没法当文案用", kind="blocked"))
+        return None
+    if isinstance(v, (int, float)):
+        fixes.append(_note(field, f"`{field}` 是数字 {v}，已按文本处理"))
+        return str(v)
+    if isinstance(v, (list, tuple)):
+        if v and all(isinstance(x, (str, int, float)) and not isinstance(x, bool) for x in v):
+            fixes.append(_note(field, f"`{field}` 是列表，已用「，」接成一句"))
+            return "，".join(str(x).strip() for x in v if str(x).strip())
+    blocking.append(_note(field, f"`{field}` 的类型是 {type(v).__name__}，没法当文案用",
+                          kind="blocked"))
+    return None
+
+
+def _as_items(field: str, v, fixes: list, blocking: list,
+              pattern: str = r"[\n;；|｜]") -> list[str]:
+    if v is None:
+        return []
+    if isinstance(v, str):
+        parts = _split_items(v, pattern)
+        fixes.append(_note(field, f"`{field}` 被写成一个字符串，已拆成 {len(parts)} 条",
+                           items=parts))
+        return parts
+    if isinstance(v, (list, tuple)):
+        out = []
+        for x in v:
+            if x is None:
+                continue
+            if isinstance(x, (str, int, float)) and not isinstance(x, bool):
+                t = str(x).strip()
+                if t:
+                    out.append(t)
+            else:
+                blocking.append(_note(field, f"`{field}` 里有一项是 {type(x).__name__}，"
+                                             f"没法当文案用", kind="blocked"))
+        return out
+    blocking.append(_note(field, f"`{field}` 应该是列表，实际是 {type(v).__name__}",
+                          kind="blocked"))
+    return []
+
+
+def _as_int(field: str, v, fixes: list, blocking: list):
+    if v is None or v == "":
+        return None
+    if isinstance(v, bool):
+        blocking.append(_note(field, f"`{field}` 是布尔值 {v}", kind="blocked"))
+        return None
+    if isinstance(v, int):
+        return v
+    if isinstance(v, float):
+        fixes.append(_note(field, f"`{field}` 是小数 {v}，已取整"))
+        return int(v)
+    if isinstance(v, str):
+        t = v.strip().replace(",", "").replace("，", "").replace(" ", "")
+        try:
+            return int(float(t))
+        except ValueError:
+            fixes.append(_note(field, f"`{field}` 是 {v!r}，不像整数，页脚会显示「—」"
+                                     f"（不确定就别写，写整数）"))
+            return None
+    blocking.append(_note(field, f"`{field}` 应该是整数，实际是 {type(v).__name__}",
+                          kind="blocked"))
+    return None
+
+
+def normalize_payload(payload) -> tuple[dict, list[dict], list[dict]]:
+    """把 payload 修成渲染器能吃的形状。
+
+    返回 (干净的 payload, 修正记录, 拦不下来的问题)。**不改文案意思**，只调类型：
+    该是列表的列表化、该是字符串的字符串化、数字能从字符串里认出来就认出来。
+    """
+    fixes: list[dict] = []
+    blocking: list[dict] = []
+    if not isinstance(payload, dict):
+        blocking.append(_note("payload", f"payload 应该是一个 JSON 对象，"
+                                         f"实际是 {type(payload).__name__}", kind="blocked"))
+        return {}, fixes, blocking
+
+    out = dict(payload)
+    for f in TEXT_FIELDS:
+        v = _as_text(f, out.get(f), fixes, blocking)
+        if v is None:
+            out.pop(f, None)
+        else:
+            out[f] = v
+    out["pain"] = _as_items("pain", out.get("pain"), fixes, blocking)
+    if out.get("topics") is not None:
+        out["topics"] = [t.lstrip("#").strip() for t in
+                         _as_items("topics", out.get("topics"), fixes, blocking,
+                                   r"[,，、;；|\s\n]+") if t]
+    out["stars"] = _as_int("stars", out.get("stars"), fixes, blocking)
+    if out.get("updated"):
+        try:
+            datetime.fromisoformat(str(out["updated"]).replace("Z", "+00:00"))
+        except ValueError:
+            fixes.append(_note("updated", f"`updated` 不是 ISO 时间（{out['updated']!r}），"
+                                          f"页脚会显示「—」"))
+    for k in list(payload):
+        if k in KNOWN_FIELDS:
+            continue
+        guess = difflib.get_close_matches(k, KNOWN_FIELDS, n=1, cutoff=0.8)
+        if guess:
+            fixes.append(_note(k, f"不认识的字段 `{k}`（是不是 `{guess[0]}`？）· 已忽略",
+                               kind="typo"))
+            out.pop(k, None)   # 认不出的字段本来就不参与渲染；留着会让第二次体检重复报同一件事
+    return out, fixes, blocking
 
 
 # ---------------------------------------------------------------- 抓数据
@@ -501,6 +697,10 @@ class Audit:
         self.scale: float = 1.0
         self.dropped: list[str] = []
         self.truncated: list[dict] = []
+        self.notes: list[dict] = []      # 渲染器为了放下「数据」自己做的适配（缩字号/省略）
+        self.flow_bottom: int = 0        # 正文流占到的 y —— 用来判「这张卡是不是太空」
+        self.payload_fixes: list[dict] = []    # payload 类型问题被就地救过的记录
+        self.payload_blocked: list[dict] = []  # 救不了、拒绝渲染的原因
 
     def add_text(self, d, img, section, xy, text, font, fill, max_w=None, bg=None) -> None:
         box = d.textbbox(xy, text, font=font)
@@ -525,6 +725,9 @@ class Audit:
             "scale": self.scale,
             "dropped": self.dropped,
             "truncated": self.truncated,
+            "notes": self.notes,
+            "flow_bottom": self.flow_bottom,
+            "payload_fixes": self.payload_fixes,
             "frames": {k: list(v) if isinstance(v, tuple) else v
                        for k, v in self.frames.items()},
             "bg_stats": self.bg_stats,
@@ -613,9 +816,13 @@ def plan_content(d, payload: dict, style: dict, scale: float = 1.0,
     text("pill", x + 18, y + 9 - 2, label, f_pill, C["accent_text"], bg=C["card_hi"])
     y += S(58)
 
-    # owner/repo
-    f_mono_s = F("mono", 26)
-    text("owner", x, y, f"{payload['owner']}/{payload['repo']}", f_mono_s, C["faint"])
+    # owner/repo（数据行：太长就缩字号 / 中间省略，绝不许顶出画面 —— 见 fit_ident）
+    ident, f_mono_s, how = fit_ident(d, f"{payload['owner']}/{payload['repo']}", "mono",
+                                     W - PAD * 2, S(26), max(13, S(18)))
+    if how:
+        ops.append({"kind": "adapt", "section": "owner", "how": how,
+                    "text": ident, "size": f_mono_s.size, "from": S(26)})
+    text("owner", x, y, ident, f_mono_s, C["faint"])
     y += S(52)
 
     # 中文名（大字，最多 2 行）
@@ -796,6 +1003,14 @@ def render(payload: dict, out_path: Path, style: dict | None = None,
     C = _palette(style)
     audit = audit if audit is not None else Audit()
 
+    # 最后一道防线：库的直接调用者也可能塞进一个类型写错的 payload。
+    # 能修的就地修（记进 audit，--check 会报出来），修不了的明确抛错、不出坏卡。
+    payload, fixes, blocked = normalize_payload(payload)
+    audit.payload_fixes.extend(fixes)
+    audit.payload_blocked.extend(blocked)
+    if blocked:
+        raise PayloadError("；".join(n["message"] for n in blocked))
+
     img = build_background(style)
     d = ImageDraw.Draw(img)
     audit.bg_stats = _bg_stats(img)
@@ -811,11 +1026,14 @@ def render(payload: dict, out_path: Path, style: dict | None = None,
     # 正文：先排版、再落笔；落笔时每块文字的位置都记进 audit
     ops, scale, skip, flow_bottom = fit_content(d, payload, style)
     audit.scale = scale
+    audit.flow_bottom = flow_bottom
     audit.dropped = [SKIP_LABELS[s] for s in skip]
     _paint_ops(img, d, ops, audit)
     for op in ops:
         if op["kind"] == "note":
             audit.truncated.append({"field": op["field"], "dropped": op["dropped"]})
+        elif op["kind"] == "adapt":
+            audit.notes.append({k: v for k, v in op.items() if k != "kind"})
 
     # 结论（底部对齐，填掉内容与页脚之间的空）
     vops, vinfo = plan_verdict(d, payload, style, flow_bottom)
@@ -828,7 +1046,7 @@ def render(payload: dict, out_path: Path, style: dict | None = None,
     d.line([(PAD, FOOT_LINE), (W - PAD, FOOT_LINE)], fill=C["line"], width=2)
     f_lbl = load_font("cn", 22)
     items = [
-        ("★ " + fmt_num(payload.get("stars", 0)), "stars"),
+        ("★ " + fmt_num(payload.get("stars")), "stars"),
         (str(payload.get("language") or "—"), "语言"),
         (str(payload.get("license") or "—"), "许可证"),
         (fmt_age(payload.get("updated")), "更新"),
@@ -844,14 +1062,34 @@ def render(payload: dict, out_path: Path, style: dict | None = None,
         audit.add_text(d, img, "data_label", (cx, foot_y + 54), lbl, f_lbl, C["faint"])
         d.text((cx, foot_y + 54), lbl, font=f_lbl, fill=C["faint"])
 
-    # 右上角话题标签
+    # 右上角话题标签：话题是仓库数据，改不了 —— 放不下就缩字号、再省掉末尾几个，
+    # 但绝不许压到左上角的「GitHub 中文速览」胶囊上（长话题以前会叠在上面）。
     topics = [t for t in (payload.get("topics") or []) if t][:3]
     if topics:
-        f_t = load_font("mono", 20)
-        total_w = sum(text_w(d, "#" + t, f_t) + 16 for t in topics) + 16 * (len(topics) - 1)
-        tx = W - PAD - total_w
-        for t in topics:
-            tw = text_w(d, "#" + t, f_t) + 16
+        chip_pad = 16
+        pill_right = PAD + text_w(d, "GitHub 中文速览", load_font("cn", 24)) + 36
+        avail = (W - PAD) - pill_right - 28
+
+        def chips_w(ts: list[str], font) -> int:
+            if not ts:
+                return 0
+            return (sum(text_w(d, "#" + t, font) + chip_pad for t in ts)
+                    + chip_pad * (len(ts) - 1))
+
+        size_t = 20
+        while size_t > 15 and chips_w(topics, load_font("mono", size_t)) > avail:
+            size_t -= 1
+        f_t = load_font("mono", size_t)
+        kept, dropped = list(topics), []
+        while kept and chips_w(kept, f_t) > avail:
+            dropped.insert(0, kept.pop())
+        if dropped or size_t != 20:
+            audit.notes.append({"section": "topics", "how": "fit", "size": size_t,
+                                "text": " ".join("#" + t for t in kept),
+                                "dropped": dropped})
+        tx = W - PAD - chips_w(kept, f_t)
+        for t in kept:
+            tw = text_w(d, "#" + t, f_t) + chip_pad
             th = f_t.size + 12
             d.rounded_rectangle([tx, 66, tx + tw, 66 + th], radius=th // 2,
                                 fill=C["card_hi"])
@@ -860,7 +1098,7 @@ def render(payload: dict, out_path: Path, style: dict | None = None,
             audit.add_text(d, img, "topics", (tx + 8, 66 + 6 - 2), "#" + t,
                            f_t, C["accent2_text"], bg=C["card_hi"])
             d.text((tx + 8, 66 + 6 - 2), "#" + t, font=f_t, fill=C["accent2_text"])
-            tx += tw + 16
+            tx += tw + chip_pad
 
     # 署名：卡片被转发时链接跟着走 —— 这是这个工具唯一的自然传播入口
     if (style.get("decor") or {}).get("credit", True):
@@ -878,6 +1116,9 @@ def render(payload: dict, out_path: Path, style: dict | None = None,
 
 # ---------------------------------------------------------------- 文案
 def to_markdown(payload: dict) -> str:
+    payload, _, blocked = normalize_payload(payload)
+    if blocked:
+        raise PayloadError("；".join(n["message"] for n in blocked))
     url = payload.get("url") or f"https://github.com/{payload['owner']}/{payload['repo']}"
     lines = [
         f"# {payload.get('name_zh', payload['repo'])}",
@@ -900,7 +1141,7 @@ def to_markdown(payload: dict) -> str:
             lines += ["**怎么装**", "", "```bash", start, "```", ""]
     lines += [f"**仓库**：{url}", ""]
     lines += [
-        f"★ {fmt_num(payload.get('stars', 0))} · {payload.get('language', '—')}"
+        f"★ {fmt_num(payload.get('stars'))} · {payload.get('language', '—')}"
         f" · {payload.get('license', '—')} · 更新于 {fmt_age(payload.get('updated'))}"
     ]
     return "\n".join(lines)
@@ -908,6 +1149,9 @@ def to_markdown(payload: dict) -> str:
 
 def to_caption(payload: dict) -> str:
     """给自媒体用的一段文案，可直接粘。"""
+    payload, _, blocked = normalize_payload(payload)
+    if blocked:
+        raise PayloadError("；".join(n["message"] for n in blocked))
     url = payload.get("url") or f"https://github.com/{payload['owner']}/{payload['repo']}"
     pains = payload.get("pain") or []
     body = [
@@ -999,6 +1243,21 @@ def main() -> None:
     if not payload:
         ap.error("需要 --payload 或 --fetch")
 
+    # payload 是 agent 写的，先过一遍类型体检：能救的救下来，救不了的不出卡。
+    payload, p_fixes, p_blocked = normalize_payload(payload)
+    if p_blocked:
+        print("payload 有问题，没有渲染（宁可不发，也不发一张坏卡）：", file=sys.stderr)
+        for n in p_blocked:
+            print(f"  [错误] {n['message']}", file=sys.stderr)
+        sys.exit(1)
+    if p_fixes:
+        quiet = bool(args.check or args.audit_json)
+        print(f"payload 类型体检：{len(p_fixes)} 处修正 / 提示"
+              + ("（逐条见下方自检）" if quiet else ""))
+        if not quiet:
+            for n in p_fixes:
+                print(f"  [{'提醒' if n['kind'] == 'typo' else '修正'}] {n['message']}")
+
     payload.setdefault("owner", "unknown")
     payload.setdefault("repo", "unknown")
     if "url" not in payload:
@@ -1012,6 +1271,7 @@ def main() -> None:
         style.setdefault("decor", {})["credit"] = False
     audit = Audit()
     png = render(payload, out_dir / f"{stem}.png", style, audit=audit)
+    audit.payload_fixes[:0] = p_fixes      # 让 --check 也把这次修正报出来
     print(f"风格: {style.get('name_zh') or style.get('id')}")
 
     if args.do_print:

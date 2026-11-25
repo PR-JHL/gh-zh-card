@@ -51,6 +51,17 @@ python gh_card.py --fetch owner/repo --payload p.json --out out/
 
 字段全部可选，缺了就不渲染那一块。但 `owner/repo/name_zh/tagline` 缺了卡就是残的。
 
+**类型别写错**，这几种是 agent 最常犯的：
+
+| 对 | 错 | 错法的后果 |
+|---|---|---|
+| `"pain": ["一条", "两条", "三条"]` | `"pain": "一条；两条；三条"` | 会被拆成单字痛点（「手」「机」「上」） |
+| `"verdict": "一句话"` | `"verdict": ["一句", "两句"]` | 崩掉；现在会用「，」接成一句 |
+| `"stars": 2059` | `"stars": null` 或 `"2059 颗"` | 页脚写「—」—— 不知道就写不知道，不写 0 |
+
+渲染器现在会就地修这些形状（并在 `--check` 里报 `PAYLOAD_FIXED`），但**源头上写对**才是省事的做法：
+形状救不回来时（`pain` 写成对象、payload 不是对象）它会 exit 1，拒绝出卡。
+
 **写完先体检，别急着渲染：**
 
 ```bash
@@ -101,6 +112,13 @@ python gh_card.py --payload p.json --offline --out out/ --check
 每一步都会在 `--check` 里报出来。看到 `COPY_DROPPED` / `COPY_TRUNCATED` 就**改文案**，
 不要改排版参数硬塞。
 
+**内容太薄时会有 `THIN_CARD` 提醒**（正文占不到版面高度的 55%）。它不会让退出码变 1，
+但那句话的意思是「这张卡替代不了 README」——补 `for_who` / `start` / 第二条第三条痛点，
+不要靠放大字号糊过去。
+
+**`owner/repo` 和 `topics` 太长不用管**：它们是仓库数据，渲染器自己会缩字号、中间省略、
+省掉放不下的，`--check` 里只会出一条 `[信息] DATA_FITTED`。别为了它去改数据。
+
 **「文案的问题」用 `copy_check.py` 管（渲染前），「版面的问题」用 `--check` 管（渲染后）。**
 
 **然后看图，只检查机器判不了的东西：**
@@ -111,6 +129,19 @@ python gh_card.py --payload p.json --offline --out out/ --check
 - **深色卡是不是"发闷"**：整张图除了文字几乎没有明暗过渡，说明 `glow` / 渐变没配好，换风格或调 JSON
 
 发现问题就缩短文案，不要改排版参数硬塞。
+
+## 每日批量出卡（daily_pick.py）
+
+```bash
+python daily_pick.py --count 5 --dry-run   # 先看今天会挑中什么，不写文件、不记账
+python daily_pick.py --count 5             # 正式抓，写 daily/<date>/candidates.json 并记 _featured
+```
+
+- `daily/_prefs.json`：`exclude` = 不要的（**整词**命中 topic/描述/仓库名就跳过），`boost` = 多找的
+  （同一类里排前面：偏好命中优先，再看星数）。改这个文件就改挑项目的口味，不用动代码；`--no-prefs` 临时忽略。
+- 同名 / 同描述的克隆仓（换 owner 重发的那种）只留一个。
+- **自动挑只是初筛。** 候选里混着「无源码只给下载链接」「README 全是营销话术」的仓库，
+  出卡前要自己判断，宁可只出 4 张，也不给这种东西做推荐卡。
 
 ## 文案质量标准
 

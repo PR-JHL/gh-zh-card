@@ -129,10 +129,38 @@ python copy_check.py daily/2026-11-19/ --online    # 在线：顺便抓实时数
 
 它不判断「文案有没有说到点上」——那要读 README，机器做不了。
 
+### 形状体检（渲染前，自动）
+
+payload 是 agent 写的 JSON，最常见的错不是「文案不好」，而是**类型写错**：`"pain": "一整段话"`、
+`"verdict": ["两句"]`、`"stars": null`。这三种以前分别会：把字符串按字符拆成三条只有单字的痛点
+（「手」「机」「上」）、`AttributeError` 崩掉、页脚写「★ None」。
+
+现在进渲染之前先过一遍类型体检：能救的就地救（并且分清「修正」和「提醒」），救不了的 exit 1 并
+说清是哪个字段，**宁可不出卡，也不出一张坏卡**。
+
+<p align="center">
+  <img src="docs/payload-guard.jpg" width="92%">
+</p>
+<p align="center"><sub>同一份 payload：上＝类型体检之前（单字痛点、页脚「None」），下＝现在</sub></p>
+
+| 写错的形状 | 现在的处理 |
+|---|---|
+| `pain` 是一整段话 | 按换行 / 分号 / 竖线拆成条目（**不按句号拆** —— 一句话本来就有句号） |
+| `verdict` / `tagline` 是列表或数字 | 列表用「，」接成一句；数字转成文本 |
+| `topics` 是一行逗号分隔的字符串 | 拆成多个标签 |
+| `stars` 是 `null` 或写不成整数 | 页脚写「—」。不知道就写不知道，不写 0 |
+| `pain` 是对象、`payload` 是数组 | 拦住，exit 1，说明哪个字段错在哪 |
+| 字段名拼错（比如 `tag_line`） | 提醒是不是 `tagline`，并忽略这个字段 |
+
 ### 版面自检（渲染后）
 
 好卡片和「压坏了的卡片」差别很小，但压坏的那张读者一眼就能看出不专业。所以渲染是
 **先排版、再落笔**：内容塞不下时先整体缩字号，再省次要区块，绝不会静默压到页脚数据条上。
+
+<p align="center">
+  <img src="docs/long-copy-before-after.jpg" width="92%">
+</p>
+<p align="center"><sub>同一份超长文案：左＝修复前（命令块压到 stars 上，结论块压到署名），右＝现在（自动缩到 88%，版面干净）</sub></p>
 
 ```bash
 python gh_card.py --payload payloads/pinky.json --offline --out out/ --check
@@ -144,20 +172,33 @@ python gh_card.py --payload payloads/pinky.json --offline --out out/ --check
 |---|---|
 | 版面 | 文字出界、压页脚数据条、两块文字互相压住、单行超宽 |
 | 文案 | 为了塞进版面被省略 / 被截断的字段 —— 该改文案，不是改排版 |
+| 信息量 | 版面干净、但正文只占了不到 55% 的竖向空间 —— 报「太空」，并列出缺哪几块 |
+| 数据行 | `owner/repo`、话题太长时的自动适配（缩字号 / 中间省略 / 省掉），是提示不是错误 |
 | 可读性 | 对比度、字号被缩得太小、豆腐块（缺字形）、深色卡发闷 |
 
 <p align="center">
-  <img src="docs/long-copy-before-after.jpg" width="92%">
+  <img src="docs/edge-cases.jpg" width="92%">
 </p>
-<p align="center"><sub>同一份超长文案：左＝修复前（命令块压到 stars 上，结论块压到署名），右＝现在（自动缩到 88%，版面干净）</sub></p>
+<p align="center"><sub>同一份 payload：上＝修复前（标识符冲出画面、长话题压住左上角胶囊、太空卡被静默放行），下＝现在</sub></p>
+
+极端输入也有兜底，因为**有些东西根本不归写文案的人管**：
+
+- **`owner/repo` 是数据，不是文案。** 超过一行宽就缩字号，缩到底还放不下才中间省略
+  （保留 owner 开头和 repo 结尾）；它不会在 `--check` 里报「必须修」——那等于让人回去改上游仓库。
+- **话题会自己让位。** 三个长话题放不下时先缩字号，再省掉末尾几个，绝不压到左上角的胶囊上。
+- **太薄的卡会被指出来。** `THIN_CARD`：正文只占版面高度不到 55% 时提醒「这张卡替代不了
+  README」，并直接列出缺哪几块。版面干净不等于卡能用。
 
 改风格、改排版之后跑一遍回归：
 
 ```bash
-python selftest.py            # 44 套风格 × 5 份 payload，逐张自检（约 2 分钟）
+python selftest.py            # 44 套风格 × 8 份 payload，逐张自检（约 3 分钟）
 python selftest.py --quick    # 6 套代表风格，十来秒
 python copy_check.py --selftest   # 体检工具自己的用例（好文案要放行、坏文案要被抓到）
 ```
+
+`selftest.py` 里有两道「自检本身有没有坏」的护栏：缺字形样本必须被抓到豆腐块，
+只有名字和一句定位的样本必须被报出 `THIN_CARD` —— 报不出来就算失败。
 
 `--sheet docs/long-copy.jpg` 还能拼一张「同一份超长文案在 8 套风格下的样子」，改排版前后对比很直观。
 
@@ -203,6 +244,8 @@ gh-zh-card · github.com/PR-JHL/gh-zh-card
 - 不做技术翻译 —— 回答「该不该看」，不是「原文说了什么」
 - 文案超长时会自动缩字号、省略次要区块，并让 `--check` 报错 —— 但内容该删还得删，
   脚本能保住版面，保不住「一张图说清一件事」
+- 反过来，文案太薄时 `--check` 只能提醒（`THIN_CARD`），补内容这件事机器替不了
+- `owner/repo` 或话题特别长时，卡上会被缩字号或中间省略 —— 那是仓库数据，脚本改不了它
 - 需要本地中文字体：Windows 微软雅黑 / macOS 苹方 / Linux Noto CJK
 - 排版只支持中文 + 英文混排；纯日文/韩文可能缺字形（`--check` 会报出豆腐块）
 

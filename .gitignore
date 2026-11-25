@@ -1,5 +1,6 @@
 # 产物
 out/
+tmp/
 tmp-*/
 tmp-smoke/
 tmp-speed/

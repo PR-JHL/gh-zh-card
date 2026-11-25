@@ -143,6 +143,16 @@ def lint(payload: dict, live: dict | None = None,
     def add(level, code, msg, detail=None):
         out.append(Finding(level, code, msg, detail))
 
+    # 0) 先过类型体检：payload 是 agent 写的，`"pain": "一句话"`、`"verdict": ["…"]`、
+    #    `"stars": null` 都很常见。不先修形状，下面的规则会拿字符/列表去比较，
+    #    要么误报，要么直接崩（`sequence item 3: expected str instance, list found`）。
+    payload, p_fixes, p_blocked = gh_card.normalize_payload(payload)
+    for n in p_fixes:
+        add("info" if n.get("kind") == "typo" else "warn", "W_PAYLOAD_FIXED",
+            n["message"] + "（渲染器也会这么修，但源头最好写对）", n)
+    for n in p_blocked:
+        add("error", "E_PAYLOAD_BROKEN", n["message"], n)
+
     text = _copy_text(payload)
 
     # 1) 基本字段
@@ -451,9 +461,37 @@ def selftest() -> int:
                 print(f"       {f.level} {f.code}: {f.message}")
             if missing:
                 print(f"       缺少预期：{sorted(missing)}")
+
+    # 类型写错（agent 写 JSON 时最常见的一种错）：不先修形状，下面所有规则都会拿字符去比
+    messy = {**GOOD, "pain": "第一条痛点写成一整段话；第二条也塞在同一行；第三条用分号隔开",
+             "verdict": ["结论被写成了列表", "应该用逗号接回一句"],
+             "stars": None, "topics": "payload, guard"}
+    clean, fixes, blocked = gh_card.normalize_payload(messy)
+    shape_checks = [
+        ("pain 是字符串 → 拆成 3 条", len(clean["pain"]) == 3),
+        ("verdict 是列表 → 接成一句", isinstance(clean["verdict"], str) and "，" in clean["verdict"]),
+        ("stars 是 null → 留空（页脚写「—」）", clean["stars"] is None),
+        ("topics 是字符串 → 拆成 2 个", clean["topics"] == ["payload", "guard"]),
+        ("每一处都记下来了", len(fixes) >= 3),
+        ("没有误判成坏 payload", not blocked),
+    ]
+    bad_shape = [name for name, good in shape_checks if not good]
+    ok = ok and not bad_shape
+    print(f"  {'类型写错':12} {'✓' if not bad_shape else '✗'}  "
+          f"修正 {len(fixes)} 处 / 拦截 {len(blocked)} 处")
+    for name in bad_shape:
+        print(f"       ✗ {name}")
+
+    # 救不了的形状必须明确拦住，不能渲染出坏卡
+    _, _, blocked2 = gh_card.normalize_payload({**GOOD, "pain": {"a": "b"}})
+    _, _, blocked3 = gh_card.normalize_payload(["这不是对象"])
+    good = bool(blocked2) and bool(blocked3)
+    ok = ok and good
+    print(f"  {'坏形状拦截':10} {'✓' if good else '✗'}  "
+          f"pain 写成对象 / payload 不是对象 都被拦住")
+
     print("\n结果:", "通过" if ok else "失败")
     return 0 if ok else 1
-
 
 # ---------------------------------------------------------------- CLI
 def main() -> int:
