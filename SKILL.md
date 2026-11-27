@@ -74,7 +74,22 @@ python copy_check.py p.json --online   # 顺便打 API 抓实时数据核对（�
 
 **「有没有说到点上」它管不了** —— 那要读 README，还是你的事。
 
-### 4. 渲染
+### 4. 出卡（一条命令）
+
+```bash
+python card_build.py p.json --style obsidian
+```
+
+它按顺序做三件事，**任何一步不过就不会说「可以发」**：
+
+1. 文案体检（`copy_check`）—— 不过就**连图都不生成**（免得那张图被顺手发出去）；
+2. 渲染 png + md + caption；
+3. 版面自检（`card_check`）—— 不过时图留着（要看得见才知道怎么改），但结论是「不能发」，退出码 1。
+
+顺手在旁边落一份 `p.card.json`：数字、**来源时间**（`stats_fetched_at`）、风格、尺寸、三个文件的
+sha256。以后要复核「这张卡当时是多少星」、或者判断这张图是不是从改过的 payload 渲出来的，都看它。
+
+只想出图不做体检时，直接调渲染器：
 
 ```bash
 python gh_card.py --payload p.json --offline --out out/ --name 01-slug --md --caption
@@ -96,10 +111,13 @@ python gh_card.py --payload p.json --offline --out out/ --name 01-slug --md --ca
 - `out/01-slug.png` —— 卡片，1080×1440（小红书 3:4 / 公众号 / X 长图都能用）
 - `out/01-slug.md` —— Markdown 版，可直接做 issue / 公众号正文
 - `out/01-slug.caption.txt` —— 自媒体文案 + hashtag
+- `out/01-slug.card.json` —— 卡片档案（数字来源、风格、sha256、能不能发）
 
 ### 5. 自检（必做）
 
-先跑脚本自检，再亲眼看一遍图。
+`card_build.py` 已经替你跑了文案体检和版面自检；它是「不能发」时，按下面的提示改，别硬塞。
+
+想单看版面（或者用 `gh_card.py` 直接渲染时）：
 
 ```bash
 python gh_card.py --payload p.json --offline --out out/ --check

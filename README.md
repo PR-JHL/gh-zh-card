@@ -55,12 +55,31 @@ pip install pillow requests   # 大多数 Python 环境已经有
 **自己用手** —— 抓数据 + 渲染：
 
 ```bash
-# 1) 先拿真实统计（会写进 payload 里已有的字段之上）
-python gh_card.py --fetch DIYgod/pinky --payload payloads/pinky.json --out out/ --name pinky
+# 一条命令出卡（推荐）：文案体检 -> 渲染 -> 版面自检 -> 落一份卡片档案
+python card_build.py payloads/pinky.json --style obsidian
 
-# 2) 或者完全离线：数字已核实过
+# 或者拆开一步步来（调试、或者只想出图不做体检时）
+python gh_card.py --fetch DIYgod/pinky --payload payloads/pinky.json --out out/ --name pinky
 python gh_card.py --payload payloads/pinky.json --offline --out examples/ --name 01-pinky --md --caption
 ```
+
+`card_build.py` 是**闸门**，不是又一个渲染器：它按顺序调用 `copy_check` → `gh_card` → `card_check`，
+任何一步报错都不给「可以发」，退出码 1。顺序是有意的 —— **文案体检不过时连图都不生成**，
+否则总会有人顺手把那张图发出去。
+
+每张卡旁边还会落一份 `<name>.card.json`：
+
+```json
+{"style": {"id": "obsidian"}, "canvas": [1080, 1440],
+ "stats": {"stars": 2059, "fetched_at": "2026-11-18T09:00:00Z"},
+ "stats_provenance": "fetched",
+ "files": {"png": {"sha256": "…", "bytes": 232802}},
+ "publishable": true, "reason": "可以发"}
+```
+
+它记下**这张卡的数字是什么时候的**、用的哪套风格、三个文件的 sha256。以前这些只在 payload 里，
+而后来的 26 份真实 payload 里一份 `stats_fetched_at` 都没有 —— 也就是说「这张卡上的星数现在还对不对」
+这件事，事后谁都回答不了。
 
 `--fetch` 会用 API 的真数据覆盖 payload 里的旧统计（文案字段不动）。再加 `--save`，数字和抓取时间
 会被写回 payload —— 之后 `copy_check.py` 才能离线复核，卡片也永远能回答「发布时星数是多少」。
@@ -111,6 +130,8 @@ python gh_card.py ... --style swiss-international  # 瑞士国际主义（最稳
 ## 自检：一只管文案，一只管版面
 
 这个工具只有两个地方会「说谎」：**文案说错**，和**版面排坏**。两只手各管一头。
+（出卡时可以用一条命令把两头和一纸档案串起来：`python card_build.py p.json --style obsidian`
+—— 文案体检 → 渲染 → 版面自检 → `<name>.card.json`，任何一步不过都不会说「可以发」。）
 
 ### 文案体检（渲染前）
 
@@ -181,8 +202,19 @@ python gh_card.py --payload payloads/pinky.json --offline --out out/ --check
 </p>
 <p align="center"><sub>同一份 payload：上＝修复前（标识符冲出画面、长话题压住左上角胶囊、太空卡被静默放行），下＝现在</sub></p>
 
-极端输入也有兜底，因为**有些东西根本不归写文案的人管**：
+还有一类更安静的出界：**行尾禁则**。为了不让标点出现在行首，换行时会允许行尾多带一个标点 ——
+那一行就比排版宽度宽一点。多数块离安全边距还有余量，看不出来；但 tagline 的可用宽度正好顶到
+安全边距，多一个字就真的出去了：
 
+<p align="center">
+  <img src="docs/wrap-guard.jpg" width="92%">
+</p>
+<p align="center"><sub>krisgfx9/Wireless-Device-Battery-Monitor：首行行尾多带一个「，」，右边缘越过安全边距 35px；现在这一块会自动降一档字号</sub></p>
+
+判据不是「比排版宽度宽」（那本是禁则的余地），而是「比这块文字真正能占的宽度还宽」——
+所以自动缩字号只在真的会出界时发生：44 套风格 × 9 份样本逐张比 sha256，**396/396 完全一致**。
+
+极端输入也有兜底，因为**有些东西根本不归写文案的人管**：
 - **`owner/repo` 是数据，不是文案。** 超过一行宽就缩字号，缩到底还放不下才中间省略
   （保留 owner 开头和 repo 结尾）；它不会在 `--check` 里报「必须修」——那等于让人回去改上游仓库。
 - **话题会自己让位。** 三个长话题放不下时先缩字号，再省掉末尾几个，绝不压到左上角的胶囊上。

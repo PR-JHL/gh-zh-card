@@ -250,19 +250,32 @@ def fit_ident(draw, s: str, kind: str, max_w: int, start: int = 26,
     return s[-3:] + "…", font, "ellipsis"
 
 
-def fit_block(draw, s: str, kind: str, max_w: int, max_lines: int,
-              start: int, min_size: int, lead: float = 1.32):
-    """从大字号往小缩，直到塞进 max_lines 行。"""
+def fit_lines(draw, kind: str, paras: list[str], max_w: int, start: int, min_size: int,
+              lead: float = 1.32, max_lines: int | None = None, limit: int | None = None):
+    """给一块文字（可多段）选字号：行数不超过 max_lines，**且每行不越过 limit**。
+
+    为什么要多这一层：wrap_cjk 的「行尾禁则」会为了不让标点跑到行首，允许行尾多带一个
+    标点 —— 那一行就比排版宽度（max_w）宽一点。多数块的文字起点离安全边距还有几像素余量，
+    这点溢出看不出来，不该动它；但 tagline 的可用宽度正好顶到安全边距，多一个字就出画
+    （2026-11-18 的 krisgfx9/Wireless-Device-Battery-Monitor 那张就是这么坏的）。
+
+    所以判据不是「比 max_w 宽」，而是「比这块文字真正能占的宽度 limit 还宽」：
+    limit 由调用方按「左边距 + 块内缩进」算出来。没传就等于 max_w。
+    真越界了才把这一块降一档字号 —— 没越界的卡一个像素都不动。
+    """
+    lim = max_w if limit is None else limit
     size = start
-    while size >= min_size:
+    while True:
         font = load_font(kind, size)
-        lines = wrap_cjk(draw, s, font, max_w)
-        if len(lines) <= max_lines:
-            return font, lines, int(size * lead)
-        size -= 2
-    font = load_font(kind, min_size)
-    lines = wrap_cjk(draw, s, font, max_w)[:max_lines]
-    return font, lines, int(min_size * lead)
+        wrapped = [wrap_cjk(draw, p, font, max_w) for p in paras]
+        too_many = max_lines is not None and any(len(w) > max_lines for w in wrapped)
+        too_wide = any(text_w(draw, ln, font) > lim for w in wrapped for ln in w)
+        if (too_many or too_wide) and size - 2 >= min_size:
+            size -= 2
+            continue
+        if max_lines is not None and too_many:
+            wrapped = [w[:max_lines] for w in wrapped]
+        return font, wrapped, int(size * lead)
 
 
 def has_cjk(s: str) -> bool:
@@ -827,9 +840,9 @@ def plan_content(d, payload: dict, style: dict, scale: float = 1.0,
 
     # 中文名（大字，最多 2 行）
     name_zh = payload.get("name_zh") or payload["repo"]
-    font_name, lines, lead = fit_block(
-        d, name_zh, "cn_bold", W - PAD * 2, 2,
-        S(int(78 * title_scale)), S(int(50 * title_scale)), lead_mul)
+    font_name, (lines,), lead = fit_lines(
+        d, "cn_bold", [name_zh], W - PAD * 2, S(int(78 * title_scale)),
+        S(int(50 * title_scale)), lead_mul, max_lines=2)
     for ln in lines:
         text("name", x, y, ln, font_name, C["text"])
         y += lead
@@ -839,8 +852,8 @@ def plan_content(d, payload: dict, style: dict, scale: float = 1.0,
     tagline = payload.get("tagline", "")
     if tagline:
         tw = W - PAD * 2 - 26
-        font_t, lines_t, lead_t = fit_block(
-            d, tagline, "cn_bold", tw, 3, S(42), S(30), lead_mul + 0.04)
+        font_t, (lines_t,), lead_t = fit_lines(
+            d, "cn_bold", [tagline], tw, S(42), S(30), lead_mul + 0.04, max_lines=3)
         rect("tagline_bar", (x, y + 4, x + 6, y + lead_t * len(lines_t) - 12),
              3, C["accent"])
         tx = x + 26
@@ -861,10 +874,10 @@ def plan_content(d, payload: dict, style: dict, scale: float = 1.0,
         f_sec = F("cn_bold", 26)
         text("section", x, y, "它能解决什么", f_sec, C["faint"])
         y += S(54)
-        f_b = F("cn", 33)
-        for p in pains:
+        f_b, wrapped_p, _ = fit_lines(d, "cn", pains, W - PAD * 2 - 44, S(33), S(22),
+                                      limit=(W - PAD) - (x + 36))
+        for p, lines_p in zip(pains, wrapped_p):
             rect("pain_dot", (x + 2, y + 14, x + 12, y + 24), 5, C["good"])
-            lines_p = wrap_cjk(d, p, f_b, W - PAD * 2 - 44)
             for ln in lines_p:
                 text("pain", x + 36, y, ln, f_b, C["text"], max_w=W - PAD * 2 - 44)
                 y += S(48)
@@ -876,8 +889,8 @@ def plan_content(d, payload: dict, style: dict, scale: float = 1.0,
     if for_who:
         text("section", x, y, "适合谁", f_sec, C["faint"])
         y += S(50)
-        f_w = F("cn", 31)
-        lines_w = wrap_cjk(d, for_who, f_w, W - PAD * 2 - 48)
+        f_w, (lines_w,), _ = fit_lines(d, "cn", [for_who], W - PAD * 2 - 48, S(31), S(20),
+                                       limit=(W - PAD) - (x + 24))
         if len(lines_w) > 3:
             note("for_who", "".join(lines_w[3:]))
             lines_w = lines_w[:3]
@@ -893,9 +906,10 @@ def plan_content(d, payload: dict, style: dict, scale: float = 1.0,
     start = "" if "start" in skip else (payload.get("start") or payload.get("install", ""))
     if start:
         is_cmd = bool(start) and not has_cjk(start)
-        f_cmd = F("mono" if is_cmd else "cn", 27)
         shown = ("$ " + start) if is_cmd else start
-        lines_c = wrap_cjk(d, shown, f_cmd, W - PAD * 2 - 40)
+        f_cmd, (lines_c,), _ = fit_lines(
+            d, "mono" if is_cmd else "cn", [shown], W - PAD * 2 - 40,
+            S(27), S(16) if is_cmd else S(20), limit=(W - PAD) - (x + 20))
         if len(lines_c) > 3:
             note("start", "".join(lines_c[3:]))
             lines_c = lines_c[:3]
@@ -947,7 +961,8 @@ def plan_verdict(d, payload: dict, style: dict, top: int) -> tuple[list[dict], d
         f = load_font("cn", size)
         step = int(size * 1.45)
         lv = wrap_cjk(d, verdict, f, W - PAD * 2 - 52)
-        if len(lv) * step + 34 <= avail:
+        fits_w = all(text_w(d, ln, f) <= (W - PAD) - (x + 26) for ln in lv)
+        if fits_w and len(lv) * step + 34 <= avail:
             f_v, lines_v = f, lv
             break
     else:

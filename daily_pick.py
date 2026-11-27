@@ -189,6 +189,10 @@ def main() -> None:
         (f"created:>{since} stars:>5 fork:false", "stars", "小体量新项目"),
     ]
 
+    # GitHub 的 owner/repo 不区分大小写，改个大小写就是同一个仓库，
+    # 所以查重也统一转小写比较（仓库改名换大小写后会重新出现在搜索里）。
+    featured_ci = {k.lower() for k in st["featured"]}
+
     picked: list[dict] = []
     seen: set[str] = set()
     skipped: list[tuple[str, list]] = []
@@ -203,9 +207,9 @@ def main() -> None:
     for q, sort, label in queries:
         for it in search(q, sort):
             full = it["full_name"]
-            if full in seen or full in st["featured"]:
+            if full.lower() in seen or full.lower() in featured_ci:
                 continue
-            seen.add(full)
+            seen.add(full.lower())
             item = {
                 "label": label,
                 "full_name": full,
